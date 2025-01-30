@@ -1,0 +1,101 @@
+{% extends 'coins/base.html' %} 
+{% block title %} 
+{{ user }}'s cabinet 
+{% endblock %} 
+{% block content %}
+<div class="row">
+    <div class="col-12 col-lg-4 col-xl-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+            <div class="container-fluid">
+                <!-- Кнопка для мобільного меню -->
+                <button class="mb-3 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Назва меню -->
+                <h6 class="d-lg-none">Menu</h6>
+
+                <!-- Блок з меню -->
+                <div class="collapse navbar-collapse" id="navbarMenu">
+                    <ol class="list-group w-100">
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Profile</div>
+                                </div>
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-coins' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">My coins</div>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{user.profile.active_coins.count}}</span>
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-exchanged-coins' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Exchanged coins</div>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{user.profile.exchanged_coins.count}}</span>
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-wait-for-delivery' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Wait  for delivery</div>
+                                </div>
+                                <span class="badge bg-secondary rounded-pill">{{user.profile.coins_wait_for_delivery.count}}</span>
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-sent' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Coin sent</div>
+                                </div>
+                                <span class="badge bg-secondary rounded-pill">{{user.profile.coins_sent.count}}</span>
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-my-offers' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">My offers</div>
+                                </div>
+                                {% if user.multi_offers_made %}
+                                <span class="badge bg-primary rounded-pill">{{user.profile.multi_offers_to_other_users_under_consideration.count}}</span>
+                                {% endif %}
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-offers-for-me' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Offers for me</div>
+                                </div>
+                                {% if user.multi_offers_look %}
+                                <span class="badge bg-primary rounded-pill">{{user.profile.multi_offers_under_consideration.count}}</span>
+                                {% endif %}
+                            </li>
+                        </a>
+                        <a class="text-decoration-none" href="{% url 'coins:user-cabinet-offers-history' %}">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Offers history</div>
+                                </div>
+                                {% if user.profile.history_of_offers_by_user %}
+                                <span class="badge bg-primary rounded-pill">{{ user.profile.history_of_offers_by_user.count }}</span>
+                                {% endif %}
+                            </li>
+                        </a>
+                    </ol>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="col-12 col-lg-8 col-xl-9">
+        {% block user_page_content %}
+        {% endblock %}
+    </div>
+</div>
+
+
+{% endblock %}
