@@ -10,26 +10,52 @@
         <br> 
         Owner {{ coin.owner }}
     </h3>
-    {% if coin.img_front %}
-    <img src="{{ coin.img_front.url }}" width="200">
-    {% else %}
-    no image
-    {% endif %}
+    
+    <div class="card mb-1">
+        <div class="card-body p-1">
+            <div class="d-flex gap-3 align-items-start">
+                {% if coin.img_front %}
+                <img src="{{ coin.img_front.url }}" width="200">
+                {% else %}
+                no image
+                {% endif %}
+                <div class="d-flex flex-column">
+                    <div>{{ coin }}</div>
+                    <div class="fs-6">Material: {{ coin.material }}</div>
+                    <div class="fs-6">Diameter: {{ coin.diameter }}</div>
+                    <div class="fs-6">Circulation: {{ coin.circulation }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 <form class='fs-3' action="{% url 'coins:create-multi-offer' %}" method="post">
 
         {% csrf_token %}
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+            <textarea name="message" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
         <h2> My coins for change </h2>
         {% for el in user.coins.all %}
-            <div>
-                <input type="checkbox" name="coin_to_give_id" id="coin-{{el.id}}" value="{{el.id}}">
-                <label for="coin-{{el.id}}">                    
-                    {% if el.img_front %}
-                    <img src="{{ el.img_front.url }}" width="100">
-                       {% else %}
-                        no image
-                        {% endif %}
-                    {{ el }}
-                </label>
+            <div class="card mb-1">
+                <div class="card-body p-1">
+                    <div class="d-flex gap-3">
+                        <input type="checkbox" name="coin_to_give_id" id="coin-{{el.id}}" value="{{el.id}}">
+                        <label class="d-flex gap-3 align-items-center" for="coin-{{el.id}}">                    
+                            {% if el.img_front %}
+                            <img src="{{ el.img_front.url }}" width="100">
+                            {% else %}
+                                no image
+                                {% endif %}
+                            <div class="d-flex flex-column">
+                                <div>{{ el }}</div>
+                                <div class="fs-6">Material: {{ el.material }}</div>
+                                <div class="fs-6">Diameter: {{ el.diameter }}</div>
+                                <div class="fs-6">Circulation: {{ el.circulation }}</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
             </div>
         {% endfor %}
         <input type="hidden" name="coin_to_get_id" value="{{ coin.id }}">

@@ -14,7 +14,7 @@
         <p class="mt-2">
             <span class="d-block">{{ coin.country }}</span>
             <span class="d-block">{{ coin.denomination }} {{ coin.year }}</span>
-            <a href="{% url 'coins:user-cabinet' pk=coin.owner.id %}" class="d-block text">{{ coin.owner }}</a>
+            <a href="{% url 'coins:owner-public' pk=coin.owner.id %}" class="d-block text">{{ coin.owner }}</a>
         </p>
     </div>
     {% endfor %}

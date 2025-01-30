@@ -1,14 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     user_pic = models.ImageField(blank=True, upload_to='coins/user_pic/')
-    phone = models.CharField(max_length=20)
-    postcode = models.CharField(max_length=10)
-    addres = models.CharField(max_length=150)
-    city = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20, blank=True)
+    postcode = models.CharField(max_length=10, blank=True)
+    addres = models.CharField(max_length=150, blank=True)
+    city = models.CharField(max_length=20, blank=True)
 
     # New Fields
     # coin_holders = models.PositiveIntegerField(default=0)
@@ -24,12 +25,16 @@ class UserProfile(models.Model):
         offers = MultiOffer.objects.filter(responder=self.user, status='c')
         return offers.exists()
 
+    def multi_offers_under_consideration(self):
+        offers = MultiOffer.objects.filter(responder=self.user, status='c')
+        return offers
+
     def multi_offers_to_other_users_under_consideration(self):
         offers = MultiOffer.objects.filter(author=self.user, status='c')
         return offers
 
     def history_of_offers_by_user(self):
-        history = MultiOffer.objects.filter(author=self.user, status='d')
+        history = MultiOffer.objects.filter((Q(author=self.user) | Q(responder=self.user)) & Q(status='d'))
         return history
 
     def active_coins(self):
@@ -37,6 +42,12 @@ class UserProfile(models.Model):
 
     def exchanged_coins(self):
         return self.user.coins.filter(status='e')
+
+    def coins_wait_for_delivery(self):
+        return self.user.coins.filter(status='w')
+
+    def coins_sent(self):
+        return self.user.coins.filter(status='s')
 
     def unread_messages_count(self):
         return self.user.received_messages.filter(is_read=False).count()
@@ -163,6 +174,7 @@ class Offer(models.Model):
 class MultiOffer(models.Model):
     coins_to_get = models.ManyToManyField(Coin, related_name='offers_get')
     coins_to_give = models.ManyToManyField(Coin, related_name='offers_give')
+    message = models.TextField(blank=True, help_text='Message')
     author = models.ForeignKey(User, related_name='multi_offers_made', on_delete=models.CASCADE)
     responder = models.ForeignKey(User, related_name='multi_offers_look', on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=status_choices, default='c')
