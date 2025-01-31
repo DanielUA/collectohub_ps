@@ -10,6 +10,14 @@
         <br> 
         Owner {{ coin.owner }}
     </h3>
+
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
     
     <div class="card mb-1">
         <div class="card-body p-1">
@@ -36,32 +44,63 @@
             <textarea name="message" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
         </div>
         <h2> My coins for change </h2>
-        {% for el in user.coins.all %}
-            <div class="card mb-1">
-                <div class="card-body p-1">
-                    <div class="d-flex gap-3">
-                        <input type="checkbox" name="coin_to_give_id" id="coin-{{el.id}}" value="{{el.id}}">
-                        <label class="d-flex gap-3 align-items-center" for="coin-{{el.id}}">                    
-                            {% if el.img_front %}
-                            <img src="{{ el.img_front.url }}" width="100">
-                            {% else %}
-                                no image
-                                {% endif %}
-                            <div class="d-flex flex-column">
-                                <div>{{ el }}</div>
-                                <div class="fs-6">Material: {{ el.material }}</div>
-                                <div class="fs-6">Diameter: {{ el.diameter }}</div>
-                                <div class="fs-6">Circulation: {{ el.circulation }}</div>
+        <!-- Поле пошуку -->
+        <input type="text" id="coinSearch" class="form-control mb-2" placeholder="Search for a coin...">
+
+        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+            <div class="row">
+                {% for el in user.coins.all %}
+                    <div class="col-12 col-md-6 coin-item" data-name="{{ el }}">
+                        <div class="card mb-1">
+                            <div class="card-body p-1">
+                                <div class="d-flex gap-3">
+                                    <input type="checkbox" name="coin_to_give_id" id="coin-{{el.id}}" value="{{el.id}}">
+                                    <label class="d-flex gap-3 align-items-center" for="coin-{{el.id}}">
+                                        <img data-src="{{ el.img_front.url }}" width="100" class="lazy-load">
+                                        <div class="d-flex flex-column">
+                                            <div>{{ el }}</div>
+                                            <div class="fs-6">Material: {{ el.material }}</div>
+                                            <div class="fs-6">Diameter: {{ el.diameter }}</div>
+                                            <div class="fs-6">Circulation: {{ el.circulation }}</div>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
-                        </label>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
         <input type="hidden" name="coin_to_get_id" value="{{ coin.id }}">
         <div>
             <input class="btn btn-primary" type="submit" value="make offer">
         </div>
     </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.getAttribute("data-src");
+                        img.classList.remove("lazy-load");
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            document.querySelectorAll(".lazy-load").forEach(img => observer.observe(img));
+
+            // Пошук по списку
+            document.getElementById("coinSearch").addEventListener("input", function () {
+                let filter = this.value.toLowerCase();
+                document.querySelectorAll(".coin-item").forEach(item => {
+                    let name = item.getAttribute("data-name").toLowerCase();
+                    item.style.display = name.includes(filter) ? "block" : "none";
+                });
+            });
+        });
+    </script>
 
 {% endblock %}

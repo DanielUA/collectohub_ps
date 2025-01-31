@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="91edb4e2-e638-40e6-81f9-e98a5d2567a8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/collectohub/coins/templates/coins/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/collectohub/coins/templates/coins/about.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

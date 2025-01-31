@@ -1,14 +1,75 @@
 {% extends 'coins/base.html' %} {% block title %} {{ continent.name }} - Coins {% endblock %} {% block content %}
 <h1>Coins of {{ continent.name }}</h1>
 <div class="row">
-    <div class="col-2">
-        {% for country in continent.get_coutries_has_coins %}
-        <div>
-            <a href="{% url 'coins:country-detail' pk=country.id%}"> {{ country }} </a>
-        </div>
-        {% endfor %}
+    <div class="col-md-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+            <div class="container-fluid">
+                <!-- Кнопка для мобільного меню -->
+                <button class="mb-3 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Назва меню -->
+                <h6 class="d-lg-none">Filters</h6>
+
+                <!-- Блок з меню -->
+                <div class="collapse navbar-collapse" id="navbarMenu">
+                    <ol class="list-group w-100">
+                        <li class="list-group-item">
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Change country
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    {% for country in continent.get_coutries_has_coins %}
+                                    <a href="{% url 'coins:country-detail' pk=country.id%}" class="text text-decoration-none">
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">{{ country }}</div>
+                                            </div>
+                                        </li>
+                                    </a>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <label>Change years:</label>
+                            <div class="d-flex gap-3">
+                                <input name="min_year" type="number" class="form-control" id="yearInput" min="{{min_year}}" max="{{max_year}}" value="{{min_year}}">
+                                <input name="max_year" type="number" class="form-control" id="yearInput" min="{{min_year}}" max="{{max_year}}" value="{{max_year}}">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Change denomination
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    {% for i in list_denomination %}
+                                    <li class="dropdown-item">
+                                        <div class="form-check">
+                                            <input name="denomination" class="form-check-input" type="checkbox" value="{{ i }}" id="flexCheckDefault">
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                {{ i }}
+                                            </label>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex gap-3">
+                                <button class="btn btn-primary confirm_filters">Confirm filters</button>
+                                <button id="resetFilters" class="btn btn-outline-danger" style="display: none;"><i class="bi bi-arrow-clockwise"></i></button>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </nav>
     </div>
-    <div class="col-10">
+    <div class="col-md-9">
         <div class="row">
             {% for coin in coins %}
             <div class="col-md-3 text-center mb-4">

@@ -1,7 +1,7 @@
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView, \
     PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from django.db.models import Q
+from django.db.models import Q, Min, Max
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -22,6 +22,7 @@ from django.core.paginator import Paginator
 
 from .forms import *
 from .sterializers import *
+from django.contrib import messages
 
 
 class IndexView(ListView):
@@ -35,10 +36,36 @@ class IndexView(ListView):
 
     def get_queryset(self):
         queryset = Coin.objects.filter(status='a').order_by('-views_counter')
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        
+        if min_year != '' and min_year is not None:
+            queryset = queryset.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            queryset = queryset.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            queryset = queryset.filter(denomination__in=denomination)
+        
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(owner=self.request.user)
 
         return queryset
+
+    def get_context_data(self, **kwargs):
+        # Отримуємо базовий контекст
+        context = super().get_context_data(**kwargs)
+
+        # Додаємо додаткові змінні до контексту
+        context["min_year"] = Coin.objects.filter(status='a').aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = Coin.objects.filter(status='a').aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = Coin.objects.order_by('denomination').values_list('denomination', flat=True).distinct()
+
+        return context
     
     
 class AboutView(View):
@@ -163,16 +190,18 @@ def multi_offers_by_user(request):
 
 def accept_multi_offer(request, pk):
     multi_offer = MultiOffer.objects.get(id=pk)
-    coins_to_get = multi_offer.coins_to_get.all().update(
-        owner = multi_offer.author,
-        status = 'e'
-    )
-    coins_to_give = multi_offer.coins_to_give.all().update(
-        owner = multi_offer.responder,
-        status = 'e'
-    )
-    multi_offer.status = 'd'
-    multi_offer.save()
+    
+    if multi_offer.valid_offer():
+        coins_to_get = multi_offer.coins_to_get.all().update(
+            owner = multi_offer.author,
+            status = 'e'
+        )
+        coins_to_give = multi_offer.coins_to_give.all().update(
+            owner = multi_offer.responder,
+            status = 'e'
+        )
+        multi_offer.status = 'd'
+        multi_offer.save()
     
     # Отримуємо сторінку, з якої прийшов запит
     referer_url = request.META.get('HTTP_REFERER')
@@ -480,7 +509,7 @@ class UserCabinetCoinsView(View):
         if not request.user.is_authenticated:
             return redirect('index')
         
-        coins = Coin.objects.filter(owner=request.user, status='a')
+        coins = Coin.objects.filter(owner=request.user, status__in=['a', 'n'])
             
         paginator = Paginator(coins, 12)
         page = request.GET.get("page", 1)
@@ -594,7 +623,7 @@ def coin_change_status(request):
     
     if coins:
         coins = Coin.objects.filter(id__in=coins)
-        if status == 'a' or status == 'w':
+        if status in ['a', 'n', 'w']:
             coins.update(status=status)
     
     # Отримуємо сторінку, з якої прийшов запит
@@ -615,6 +644,25 @@ class ContinentDetailView(DetailView):
         
         # Додаємо свій контекст
         coins = self.object.get_active_coins()
+
+        # Додаємо додаткові змінні до контексту
+        context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        
+        if min_year != '' and min_year is not None:
+            coins = coins.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            coins = coins.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            coins = coins.filter(denomination__in=denomination)
             
         paginator = Paginator(coins, 12)
         page = self.request.GET.get("page", 1)
@@ -639,6 +687,25 @@ class CountryDetailView(DetailView):
         
         # Додаємо свій контекст
         coins = self.object.coins.all()
+
+        # Додаємо додаткові змінні до контексту
+        context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        
+        if min_year != '' and min_year is not None:
+            coins = coins.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            coins = coins.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            coins = coins.filter(denomination__in=denomination)
             
         paginator = Paginator(coins, 12)
         page = self.request.GET.get("page", 1)
@@ -770,24 +837,46 @@ def multi_offer_view(request, pk):
 
 
 def create_new_multi_offer(request):
-    coins_to_get_ids = request.POST.getlist('coin_to_get_id')
-    coins_to_give_ids = request.POST.getlist('coin_to_give_id')
-    message = request.POST.get('message')
+    if request.method != "POST":
+        return HttpResponseRedirect(reverse('coins:index'))
 
-    coins_to_get = Coin.objects.filter(id__in=coins_to_get_ids)
-    coins_to_give = Coin.objects.filter(id__in=coins_to_give_ids)
-    # responder_id = request.POST.get('recipient_id')
+    try:
+        coins_to_get_ids = request.POST.getlist('coin_to_get_id')
+        coins_to_give_ids = request.POST.getlist('coin_to_give_id')
+        message = request.POST.get('message')
 
-    responder = User.objects.get(id=coins_to_get[0].owner.id)
-    new_multi_offer = MultiOffer(
-        author=request.user,
-        responder=responder,
-        message=message or ''
-    )
-    new_multi_offer.save()
-    new_multi_offer.coins_to_get.add(*coins_to_get)
-    new_multi_offer.coins_to_give.add(*coins_to_give)
-    return HttpResponseRedirect(reverse('coins:index'))
+        if not coins_to_get_ids or not coins_to_give_ids:
+            raise ValueError("You must select at least one coin to get and one coin to give.")
+
+        coins_to_get = Coin.objects.filter(id__in=coins_to_get_ids)
+        coins_to_give = Coin.objects.filter(id__in=coins_to_give_ids)
+
+        if not coins_to_get.exists():
+            raise ValueError("Selected coins to get do not exist.")
+        if not coins_to_give.exists():
+            raise ValueError("Selected coins to give do not exist.")
+
+        responder = User.objects.get(id=coins_to_get.first().owner.id)
+
+        new_multi_offer = MultiOffer(
+            author=request.user,
+            responder=responder,
+            message=message or ''
+        )
+        new_multi_offer.save()
+        new_multi_offer.coins_to_get.add(*coins_to_get)
+        new_multi_offer.coins_to_give.add(*coins_to_give)
+
+        return HttpResponseRedirect(reverse('coins:index'))
+
+    except ValueError as e:
+        messages.error(request, str(e))
+    except User.DoesNotExist:
+        messages.error(request, "The selected user does not exist.")
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {e}")
+
+    return render(request, 'coins/coin_make_offer.html', {'coin': Coin.objects.get(id=coins_to_get_ids[0])})
 
 
 # @login_required

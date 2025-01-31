@@ -5,6 +5,8 @@
     <div class="d-flex gap-3 mb-3" style="max-width: 400px;">
         <select name="status" id="" class="form-select">
             <option value="">--Please choose status--</option>
+            <option value="a">Active</option>
+            <option value="n">Not active</option>
             <option value="w">Deliver to me</option>
         </select>
         <input type="submit" value="change status" class="btn btn-primary" />
@@ -34,7 +36,7 @@
                     <div class="d-flex justify-content-between">
                         <div>{{ coin.country }}</div>
                         <div>
-                            <span class="badge bg-success">
+                            <span class="badge {% if coin.get_status_display == 'active' %}bg-success{% elif coin.get_status_display == 'not active' %}bg-danger{% endif %}">
                                 {{ coin.get_status_display }}
                             </span>
                         </div>
