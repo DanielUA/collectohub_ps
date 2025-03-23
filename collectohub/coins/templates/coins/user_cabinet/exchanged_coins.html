@@ -35,7 +35,20 @@
                     {% endif %}
                 </a>
                 <div class="card-body">
-                    <h6 class="card-title">{{ coin.denomination }} {{ coin.year }}</h6>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title mb-0">{{ coin.denomination }} {{ coin.year }}</h6>
+                        {% if coin.box %}
+                        <span class="text-success d-flex align-items-center gap-1" title="Підтверджена">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <small>Verified</small>
+                        </span>
+                        {% else %}
+                        <span class="text-danger d-flex align-items-center gap-1" title="Не підтверджена">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            <small>Unverified</small>
+                        </span>
+                        {% endif %}
+                    </div>
                     <div class="d-flex justify-content-between">
                         <div>{{ coin.country }}</div>
                         <div>

@@ -1,6 +1,8 @@
+from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 
 
 class UserProfile(models.Model):
@@ -22,15 +24,15 @@ class UserProfile(models.Model):
         return offers.exists()
 
     def has_multi_offers_under_consideration(self):
-        offers = MultiOffer.objects.filter(responder=self.user, status='c')
+        offers = MultiOffer.objects.filter(responder=self.user, status__in=['c', 'a'])
         return offers.exists()
 
     def multi_offers_under_consideration(self):
-        offers = MultiOffer.objects.filter(responder=self.user, status='c')
+        offers = MultiOffer.objects.filter(responder=self.user, status__in=['c', 'a'])
         return offers
 
     def multi_offers_to_other_users_under_consideration(self):
-        offers = MultiOffer.objects.filter(author=self.user, status='c')
+        offers = MultiOffer.objects.filter(author=self.user, status__in=['c', 'a'])
         return offers
 
     def history_of_offers_by_user(self):
@@ -147,9 +149,39 @@ class Coin(models.Model):
     class Meta:
         verbose_name = 'Coin'
         verbose_name_plural = 'Coins'
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.country.name} - {self.denomination} - {self.year}'
+
+    def save(self, *args, **kwargs):
+        if self.pk:  # If this is an update
+            old_coin = Coin.objects.get(pk=self.pk)
+            if old_coin.box is None and self.box is not None:
+                # Check for active MultiOffers containing this coin
+                multi_offers = MultiOffer.objects.filter(
+                    (Q(coins_to_get=self) | Q(coins_to_give=self)),
+                    status='a'
+                ).distinct()
+                
+                for offer in multi_offers:
+                    # Message for author
+                    Message.objects.create(
+                        text=f'Coin {self.country.name} {self.denomination} {self.year} has been verified. The offer is ready for confirmation.',
+                        author=User.objects.get(id=1),
+                        recipient=offer.author,
+                        topic='Offer Update'
+                    )
+                    
+                    # Message for responder
+                    Message.objects.create(
+                        text=f'Coin {self.country.name} {self.denomination} {self.year} has been verified. The offer is ready for confirmation.',
+                        author=User.objects.get(id=1),
+                        recipient=offer.responder,
+                        topic='Offer Update'
+                    )
+        
+        super().save(*args, **kwargs)
 
 
 class Box(models.Model):
@@ -159,7 +191,7 @@ class Box(models.Model):
         return self.name
 
 
-status_choices = [('с', 'under consideration'), ('d', 'done')]
+status_choices = [('с', 'under consideration'), ('a', 'accepted'), ('d', 'done')]
 
 
 class Offer(models.Model):
@@ -181,11 +213,29 @@ class MultiOffer(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def valid_offer(self):
+        if self.created < timezone.now() - timedelta(days=7):
+            return False
         if self.coins_to_get.all().exclude(owner=self.responder).exists():
             return False
         if self.coins_to_give.all().exclude(owner=self.author).exists():
             return False
         return True
+
+    def valid_offer_for_accept(self):
+        if self.coins_to_get.all().filter(box__isnull=True).exists():
+            return False
+        if self.coins_to_give.all().filter(box__isnull=True).exists():
+            return False
+        return True
+
+    def who_must_verify_coins(self):
+        if self.coins_to_get.all().filter(box__isnull=True).exists() and self.coins_to_give.all().filter(box__isnull=True).exists():
+            return 'author and responder'
+        if self.coins_to_get.all().filter(box__isnull=True).exists():
+            return 'author'
+        if self.coins_to_give.all().filter(box__isnull=True).exists():
+            return 'responder'
+        return None
 
 
 class Message(models.Model):

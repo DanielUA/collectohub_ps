@@ -7,17 +7,7 @@
 <p> Found: {{ coin_list.count }} </p>
 <div class="row">
     {% for coin in coin_list %}
-    <div class="col-md-3 text-center mb-4">
-        <a href="{% url 'coins:coin-detail' pk=coin.id %}" class="text-light text-decoration-none">
-            <img src="{{ coin.img_front.url }}" alt="coin" class="img-fluid rounded shadow-sm hover-zoom">
-        </a>
-        <p class="mt-2">
-            <span class="d-block">{{ coin.country }}</span>
-            <span class="d-block">{{ coin.denomination }} {{ coin.year }}</span>
-            <a href="{% url 'coins:owner-public' pk=coin.owner.id %}" class="d-block text">{{ coin.owner }}</a>
-        </p>
-    </div>
+        {% include 'coins/elements/coin_card.html' with coin=coin %}
     {% endfor %}
 </div>
-{{ coin_list }}
 {% endblock %}

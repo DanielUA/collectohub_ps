@@ -104,6 +104,17 @@
        <div class="card">
            <div class="card-body">
                 <p class="fs-2">
+                    {% if coin.box %}
+                    <span class="text-success d-flex align-items-center" title="Підтверджена">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <small class="ms-1">Verified</small>
+                    </span>
+                    {% else %}
+                    <span class="text-danger d-flex align-items-center" title="Не підтверджена">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <small class="ms-1">Unverified</small>
+                    </span>
+                    {% endif %}
                     {{ coin.country }} {{ coin.denomination }} {{ coin.year }} 
                     
                </p>
@@ -139,7 +150,7 @@
     <img src="" id="img-modal" alt="">
   </div>
 </div>
-<!--{% include 'coins/multi_offer.html' %}-->
+{% comment %} {% include 'coins/multi_offer.html' %} {% endcomment %}
 
 <script>
   var modal = document.getElementById("myModal");

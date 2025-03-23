@@ -5,74 +5,7 @@
 <h4>My offers under consideration to another users ({{ offers|length }}):</h4>
 
 {% for multi_offer in offers %}
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-3">
-            <p class="fs-4">Offer #{{ multi_offer.id }} to {{ multi_offer.responder }} ({{ multi_offer.created|timesince }})</p>
-
-            <div class="d-flex gap-3">
-                <form action="{% url 'coins:cancel-multi-offer' pk=multi_offer.id %}" method="post">
-                    {% csrf_token %}
-                    <input type="submit" value="cancel offer" class="btn btn-danger" />
-                </form>
-            </div>
-        </div>
-
-        <p>{{ multi_offer.responder }}'s coins:</p>
-
-        <div class="row">
-            {% for coin in multi_offer.coins_to_get.all %}
-            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                <div class="card mb-3">
-                    <a href="{% url 'coins:coin-detail' pk=coin.id %}">
-                        {% if coin.img_front %}
-                        <img src="{{ coin.img_front.url }}" alt="coin" class="card-img-top" />
-                        {% else %} no image {% endif %}
-                    </a>
-                    <div class="card-body p-2">
-                        <h6 class="card-title">{{ coin.denomination }} {{ coin.year }}</h6>
-                        <div>{{ coin.country }}</div>
-                        <div>Material: {{ coin.material }}</div>
-                        <div>Diameter: {{ coin.diameter }}</div>
-                        <div>Circulation: {{ coin.circulation }}</div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <hr />
-
-        <p>your coins:</p>
-        <div class="row">
-            {% for coin in multi_offer.coins_to_give.all %}
-            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                <div class="card mb-3">
-                    <a href="{% url 'coins:coin-detail' pk=coin.id %}">
-                        {% if coin.img_front %}
-                        <img src="{{ coin.img_front.url }}" alt="coin" class="card-img-top" />
-                        {% else %} no image {% endif %}
-                    </a>
-                    <div class="card-body p-2">
-                        <h6 class="card-title">{{ coin.denomination }} {{ coin.year }}</h6>
-                        <div>{{ coin.country }}</div>
-                        <div>Material: {{ coin.material }}</div>
-                        <div>Diameter: {{ coin.diameter }}</div>
-                        <div>Circulation: {{ coin.circulation }}</div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% if multi_offer.message %}
-        <div>
-            <h4>Message</h4>
-            <p>{{ multi_offer.message }}</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
+    {% include 'coins/elements/offer_card.html' %}
 {% endfor %}
 
 <div class="d-flex justify-content-center my-3">

@@ -23,6 +23,8 @@ from django.core.paginator import Paginator
 from .forms import *
 from .sterializers import *
 from django.contrib import messages
+from django.db import transaction
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class IndexView(ListView):
@@ -172,7 +174,7 @@ def offers_by_user(request):
 
 def multi_offers_by_user(request):
         
-    offers = MultiOffer.objects.filter(responder=request.user, status='c')
+    offers = MultiOffer.objects.filter(responder=request.user, status__in=['c', 'a'])
         
     paginator = Paginator(offers, 12)
     page = request.GET.get("page", 1)
@@ -192,16 +194,35 @@ def accept_multi_offer(request, pk):
     multi_offer = MultiOffer.objects.get(id=pk)
     
     if multi_offer.valid_offer():
-        coins_to_get = multi_offer.coins_to_get.all().update(
-            owner = multi_offer.author,
-            status = 'e'
-        )
-        coins_to_give = multi_offer.coins_to_give.all().update(
-            owner = multi_offer.responder,
-            status = 'e'
-        )
-        multi_offer.status = 'd'
-        multi_offer.save()
+        if not multi_offer.valid_offer_for_accept():
+            multi_offer.status = 'a'
+            multi_offer.save()
+            if multi_offer.coins_to_get.all().filter(box__isnull=True).exists():
+                Message.objects.create(
+                    author=User.objects.get(id=1),
+                    recipient=multi_offer.responder,
+                    topic=f'Offer {multi_offer.id} accepted',
+                    text=f'The offer {multi_offer.id} has been accepted, but you must verify the coins within 7 days to complete the exchange'
+                )
+            if multi_offer.coins_to_give.all().filter(box__isnull=True).exists():
+                Message.objects.create(
+                    author=User.objects.get(id=1),
+                    recipient=multi_offer.author,
+                    topic=f'Offer {multi_offer.id} accepted',
+                    text=f'The offer {multi_offer.id} has been accepted by {multi_offer.responder.username}, but you must verify the coins within 7 days to complete the exchange'
+                )
+                
+        else:
+            coins_to_get = multi_offer.coins_to_get.all().update(
+                owner = multi_offer.author,
+                status = 'e'
+            )
+            coins_to_give = multi_offer.coins_to_give.all().update(
+                owner = multi_offer.responder,
+                status = 'e'
+            )
+            multi_offer.status = 'd'
+            multi_offer.save()
     
     # Отримуємо сторінку, з якої прийшов запит
     referer_url = request.META.get('HTTP_REFERER')
@@ -502,7 +523,6 @@ class UserCabinetOffersForMeView(View):
         context = { 'offers': offers }
         return render(request, 'coins/user_cabinet/offers_for_me.html', context)
 
-
 class UserCabinetCoinsView(View):
     @staticmethod
     def get(request, *args, **kwargs):
@@ -782,6 +802,107 @@ def coin_sended(request):
     )
     new_message.save()
     return HttpResponseRedirect(reverse('coins:coins-to-send-user', kwargs={"pk": coins[0].owner.id}))
+
+
+def validate_image(image):
+    # Check file size
+    if image.size > 10 * 1024 * 1024:  # 10MB
+        raise ValidationError("Image file size must be under 10MB")
+    
+    # Check file extension
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.webp']
+    ext = os.path.splitext(image.name)[1].lower()
+    if ext not in valid_extensions:
+        raise ValidationError(f"Only {', '.join(valid_extensions)} files are allowed")
+
+class CreateCoin(LoginRequiredMixin, View):
+    login_url = 'coins:signin'  # URL to redirect to if user is not logged in
+    
+    @staticmethod
+    def get(request, *args, **kwargs):
+        context = {
+            'countries': Country.objects.all().order_by('name'),
+            'material_choices': material_choices,
+            'safety_choices': safety_choices,
+        }
+        return render(
+            request,
+            'coins/user_cabinet/create_coin.html',
+            context
+        )
+        
+    def post(self, request, *args, **kwargs):
+        context = {
+            'errors': {},
+            'countries': Country.objects.all().order_by('name'),
+            'material_choices': material_choices,
+            'safety_choices': safety_choices,
+        }
+        
+        try:
+            # Get form data
+            country_id = request.POST.get('country')
+            denomination = request.POST.get('denomination')
+            year = request.POST.get('year')
+            material = request.POST.get('material')
+            safety = request.POST.get('safety')
+            weight = request.POST.get('weight')
+            diameter = request.POST.get('diameter')
+            thickness = request.POST.get('thickness')
+            circulation = request.POST.get('circulation')
+
+            # Validate required fields
+            if not country_id:
+                context['errors'] = 'Country is required'
+            if not denomination:
+                context['errors'] = 'Denomination is required'
+            if not year:
+                context['errors'] = 'Year is required'
+
+            # Validate all image fields
+            required_images = ['img_front', 'img_back', 'img_add_1', 'img_add_2']
+            for img_field in required_images:
+                if img_field not in request.FILES:
+                    context['errors'] = f'All images are required'
+                else:
+                    try:
+                        validate_image(request.FILES[img_field])
+                    except ValidationError as e:
+                        context['errors'] = str(e)
+            
+            # Return if there are validation errors
+            if context['errors']:
+                return render(request, 'coins/user_cabinet/create_coin.html', context)
+
+            with transaction.atomic():
+                # Create new coin
+                coin = Coin(
+                    country_id=country_id,
+                    denomination=denomination,
+                    year=int(year),
+                    material=material if material else '',
+                    safety=safety if safety else '',
+                    weight=float(weight) if weight else None,
+                    diameter=float(diameter) if diameter else None,
+                    thickness=float(thickness) if thickness else None,
+                    circulation=int(circulation) if circulation else None,
+                    owner=request.user,
+                    status='a',  # Set default status to active
+                    img_front=request.FILES['img_front'],
+                    img_back=request.FILES['img_back'],
+                    img_add_1=request.FILES['img_add_1'],
+                    img_add_2=request.FILES['img_add_2']
+                )
+
+                coin.save()
+                return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
+
+        except ValueError as e:
+            context['errors'] = str(e)
+        except Exception as e:
+            context['errors'] = f'An error occurred while creating the coin: {str(e)}'
+            
+        return render(request, 'coins/user_cabinet/create_coin.html', context)
 
 
 class MailBox(DetailView):
