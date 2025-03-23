@@ -1,0 +1,109 @@
+{% extends 'coins/user_cabinet/base_user_cabinet.html' %}
+
+{% block user_page_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="mb-3">Add New Coin</h2>
+                    {% if errors %}
+                        <div class="alert alert-danger">
+                            {{ errors }}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="country" class="form-label">Country*</label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">Select country</option>
+                                    {% for country in countries %}
+                                        <option value="{{ country.id }}">{{ country.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="denomination" class="form-label">Denomination*</label>
+                                <input type="text" class="form-control" id="denomination" name="denomination" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="year" class="form-label">Year*</label>
+                                <input type="number" class="form-control" id="year" name="year" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="material" class="form-label">Material</label>
+                                <select class="form-select" id="material" name="material">
+                                    <option value="">Select material</option>
+                                    {% for value, label in material_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="safety" class="form-label">Safety</label>
+                                <select class="form-select" id="safety" name="safety">
+                                    <option value="">Select safety</option>
+                                    {% for value, label in safety_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="circulation" class="form-label">Circulation</label>
+                                <input type="number" class="form-control" id="circulation" name="circulation">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="weight" class="form-label">Weight (g)</label>
+                                <input type="number" step="0.01" class="form-control" id="weight" name="weight">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="diameter" class="form-label">Diameter (mm)</label>
+                                <input type="number" step="0.01" class="form-control" id="diameter" name="diameter">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="thickness" class="form-label">Thickness (mm)</label>
+                                <input type="number" step="0.01" class="form-control" id="thickness" name="thickness">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="img_front" class="form-label">Front Image*</label>
+                                <input type="file" class="form-control" id="img_front" name="img_front" accept="image/*" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="img_back" class="form-label">Back Image*</label>
+                                <input type="file" class="form-control" id="img_back" name="img_back" accept="image/*" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="img_add_1" class="form-label">Additional Image 1</label>
+                                <input type="file" class="form-control" id="img_add_1" name="img_add_1" accept="image/*">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="img_add_2" class="form-label">Additional Image 2</label>
+                                <input type="file" class="form-control" id="img_add_2" name="img_add_2" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Create Coin</button>
+                        </div>
+                    </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

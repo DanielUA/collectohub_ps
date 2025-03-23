@@ -1,0 +1,31 @@
+<div class="col-6 col-md-4 col-lg-3 col-xl-2">
+    <div class="card mb-3">
+        <a href="{% url 'coins:coin-detail' pk=coin.id %}">
+            {% if coin.img_front %}
+            <img src="{{ coin.img_front.url }}" alt="coin" class="card-img-top" />
+            {% else %}
+            no image
+            {% endif %}
+        </a>
+        <div class="card-body p-2">
+            <h6 class="card-title">{{ coin.denomination }} {{ coin.year }}</h6>
+            <div class="d-flex align-items-center gap-2">
+                {% if coin.box %}
+                <span class="text-success d-flex align-items-center" title="Підтверджена">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <small class="ms-1">Verified</small>
+                </span>
+                {% else %}
+                <span class="text-danger d-flex align-items-center" title="Не підтверджена">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <small class="ms-1">Unverified</small>
+                </span>
+                {% endif %}
+            </div>
+            <div>{{ coin.country }}</div>
+            <div>Material: {{ coin.material }}</div>
+            <div>Diameter: {{ coin.diameter }}</div>
+            <div>Circulation: {{ coin.circulation }}</div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,124 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-3">
+            <p class="fs-4">Offer #{{ multi_offer.id }} to {{ multi_offer.responder }} ({{ multi_offer.created|timesince }})</p>
+                
+            <div class="d-flex gap-3">
+                {% if user.id == multi_offer.responder.id and multi_offer.valid_offer and multi_offer.status == 'c' %}
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#acceptModal{{ multi_offer.id }}">
+                    Accept offer
+                </button>
+                {% elif user.id == multi_offer.responder.id and multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#acceptModal{{ multi_offer.id }}">
+                    Accept offer
+                </button>
+                {% endif %}
+
+                {% if multi_offer.status in 'c,a' %}
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ multi_offer.id }}">
+                    Cancel offer
+                </button>
+                {% endif %}
+            </div>    
+        </div>
+
+        {% if not multi_offer.valid_offer %}
+        <div class="alert alert-danger my-3">
+            The offer is not valid, the coins have already been exchanged
+        </div>
+        {% endif %}
+        {% if user.id == multi_offer.responder.id %}
+            {% if not multi_offer.valid_offer_for_accept and multi_offer.status == 'c' %}
+            <div class="alert alert-warning my-3">
+                <strong>Coins not verified</strong>
+                <p>If you accept the offer, you must check when the {{ multi_offer.who_must_verify_coins }} will verify the coins, after which you can complete the exchange</p>
+            </div>
+            {% endif %}
+            {% if multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
+            <div class="alert alert-success my-3">
+                <strong>The offer is accepted, the coins is verified</strong>
+                <p>You can now exchange the coins. Please, click on the button below to exchange the coins.</p>
+            </div>
+            {% endif %}
+        {% endif %}
+        {% if not multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
+        <div class="alert alert-warning my-3">
+            <strong>The offer is accepted, but the coins is not verified</strong>
+            <p>The {{ multi_offer.who_must_verify_coins }} must verify the coins within 7 days</p>
+        </div>
+        {% endif %}
+        {% if user.id == multi_offer.author.id and multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
+        <div class="alert alert-success my-3">
+            <strong>The offer is accepted, the coins is verified</strong>
+            <p>The responder can now exchange the coins.</p>
+        </div>
+        {% endif %}
+
+        {% if multi_offer.valid_offer %}
+        <div class="modal fade" id="acceptModal{{ multi_offer.id }}" tabindex="-1" aria-labelledby="acceptModalLabel{{ multi_offer.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="acceptModalLabel{{ multi_offer.id }}">Confirmation of offer acceptance</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to accept this offer?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cencel</button>
+                        <form action="{% url 'coins:accept-multi-offer' pk=multi_offer.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Confirm</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="modal fade" id="cancelModal{{ multi_offer.id }}" tabindex="-1" aria-labelledby="cancelModalLabel{{ multi_offer.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModalLabel{{ multi_offer.id }}">Confirmation of offer cancellation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to cancel this offer?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cencel</button>
+                        <form action="{% url 'coins:cancel-multi-offer' pk=multi_offer.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Confirm</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p>{{ multi_offer.responder }}'s coins:</p>
+        <div class="row">
+            {% for coin in multi_offer.coins_to_get.all %}
+                {% include 'coins/elements/offer_coin_card.html' %}
+            {% endfor %}
+        </div>
+
+        <hr>
+
+        <p>your coins:</p>
+        <div class="row">
+            {% for coin in multi_offer.coins_to_give.all %}
+                {% include 'coins/elements/offer_coin_card.html' %}
+            {% endfor %}
+        </div>
+
+        {% if multi_offer.message %}
+        <div>
+            <h4>Message</h4>
+            <p>{{ multi_offer.message }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div> 
