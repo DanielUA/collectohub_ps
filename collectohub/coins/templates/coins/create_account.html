@@ -42,7 +42,7 @@
 
     <div class="col-6 col-md-3">
         <label for="Postcode" class="form-label">Postcode</label>
-        <input name="postcode" value="{{ form_data.postcode }}" type="number" class="form-control {% if errors.postcode %}is-invalid{% endif %}" id="Postcode" required />
+        <input name="postcode" value="{{ form_data.postcode }}" type="text" class="form-control {% if errors.postcode %}is-invalid{% endif %}" id="Postcode" required />
         <div class="invalid-feedback">{{ errors.postcode }}</div>
     </div>
 
