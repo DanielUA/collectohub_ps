@@ -12,3 +12,5 @@ pycache/
 pycache
 
 *.pyc
+
+venv
