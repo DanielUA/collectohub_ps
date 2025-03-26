@@ -706,7 +706,7 @@ class CountryDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         
         # Додаємо свій контекст
-        coins = self.object.coins.all()
+        coins = self.object.get_active_coins()
 
         # Додаємо додаткові змінні до контексту
         context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
