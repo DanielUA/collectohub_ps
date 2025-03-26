@@ -40,6 +40,7 @@ urlpatterns = [
     path('coins/send/<int:pk>/', views.CoinsToSendUserListView.as_view(), name='coins-to-send-user'),
     path('coin/sended/', views.coin_sended, name='coins-sended'),
     path('coin/create/', views.CreateCoin.as_view(), name='coin-create'),
+    path('coin/update/<int:pk>/', views.UpdateCoin.as_view(), name='coin-update'),
     path('user/mailbox/<int:pk>/', views.MailBox.as_view(), name='user-mail-box'),
     path('message/<int:pk>/', views.MessageDetailView.as_view(), name='message-detail'),
     path('message/create/<int:pk>/', views.create_new_message, name='create-new-message'),

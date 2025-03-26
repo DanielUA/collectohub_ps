@@ -905,6 +905,104 @@ class CreateCoin(LoginRequiredMixin, View):
         return render(request, 'coins/user_cabinet/create_coin.html', context)
 
 
+class UpdateCoin(LoginRequiredMixin, View):
+    login_url = 'coins:signin'
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            # Додаємо перевірку на box=None
+            coin = Coin.objects.get(id=kwargs['pk'], owner=request.user, box__isnull=True)
+            context = {
+                'coin': coin,
+                'countries': Country.objects.all().order_by('name'),
+                'material_choices': material_choices,
+                'safety_choices': safety_choices,
+            }
+            return render(request, 'coins/user_cabinet/update_coin.html', context)
+        except Coin.DoesNotExist:
+            messages.error(request, "You can only edit unverified coins.")
+            return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
+        
+    def post(self, request, *args, **kwargs):
+        try:
+            # Додаємо перевірку на box=None
+            coin = Coin.objects.get(id=kwargs['pk'], owner=request.user, box__isnull=True)
+            context = {
+                'coin': coin,
+                'errors': {},
+                'countries': Country.objects.all().order_by('name'),
+                'material_choices': material_choices,
+                'safety_choices': safety_choices,
+            }
+            
+            # Get form data
+            country_id = request.POST.get('country')
+            denomination = request.POST.get('denomination')
+            year = request.POST.get('year')
+            material = request.POST.get('material')
+            safety = request.POST.get('safety')
+            weight = request.POST.get('weight')
+            diameter = request.POST.get('diameter')
+            thickness = request.POST.get('thickness')
+            circulation = request.POST.get('circulation')
+
+            # Validate required fields
+            if not country_id:
+                context['errors'] = 'Country is required'
+            if not denomination:
+                context['errors'] = 'Denomination is required'
+            if not year:
+                context['errors'] = 'Year is required'
+
+            # Validate image fields only if new images are uploaded
+            for img_field in ['img_front', 'img_back', 'img_add_1', 'img_add_2']:
+                if img_field in request.FILES:
+                    try:
+                        validate_image(request.FILES[img_field])
+                    except ValidationError as e:
+                        context['errors'] = str(e)
+            
+            if context['errors']:
+                return render(request, 'coins/user_cabinet/update_coin.html', context)
+
+            with transaction.atomic():
+                # Update coin fields
+                coin.country_id = country_id
+                coin.denomination = denomination
+                coin.year = int(year)
+                coin.material = material if material else ''
+                coin.safety = safety if safety else ''
+                coin.weight = float(weight) if weight else None
+                coin.diameter = float(diameter) if diameter else None
+                coin.thickness = float(thickness) if thickness else None
+                coin.circulation = int(circulation) if circulation else None
+
+                # Update images only if new ones are uploaded
+                for img_field in ['img_front', 'img_back', 'img_add_1', 'img_add_2']:
+                    if img_field in request.FILES:
+                        # Delete old image if it exists
+                        old_image = getattr(coin, img_field)
+                        if old_image:
+                            old_image_path = old_image.path
+                            if os.path.isfile(old_image_path):
+                                os.remove(old_image_path)
+                        # Set new image
+                        setattr(coin, img_field, request.FILES[img_field])
+
+                coin.save()
+                return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
+
+        except Coin.DoesNotExist:
+            messages.error(request, "You can only edit unverified coins.")
+            return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
+        except ValueError as e:
+            context['errors'] = str(e)
+        except Exception as e:
+            context['errors'] = f'An error occurred while updating the coin: {str(e)}'
+            
+        return render(request, 'coins/user_cabinet/update_coin.html', context)
+
+
 class MailBox(DetailView):
     model = User
     template_name = 'coins/mail_box.html'
