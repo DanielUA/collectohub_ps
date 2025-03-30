@@ -530,6 +530,28 @@ class UserCabinetCoinsView(View):
             return redirect('index')
         
         coins = Coin.objects.filter(owner=request.user, status__in=['a', 'n'])
+        
+        # Status filter
+        status = request.GET.get('status')
+        if status:
+            coins = coins.filter(status=status)
+        
+        # Verification filter
+        verified = request.GET.get('verified')
+        if verified:
+            if verified == '1':
+                coins = coins.filter(box__isnull=False)
+            else:
+                coins = coins.filter(box__isnull=True)
+        
+        # Search filter
+        search = request.GET.get('search')
+        if search:
+            coins = coins.filter(
+                Q(denomination__icontains=search) |
+                Q(year__icontains=search) |
+                Q(country__name__icontains=search)
+            )
             
         paginator = Paginator(coins, 12)
         page = request.GET.get("page", 1)
@@ -541,7 +563,13 @@ class UserCabinetCoinsView(View):
         except EmptyPage:
             coins = paginator.page(paginator.num_pages)
             
-        context = { 'coins': coins }
+        context = {
+            'coins': coins,
+            # Додаємо параметри фільтрації в контекст
+            'status': status,
+            'verified': verified,
+            'search': search
+        }
             
         return render(request, 'coins/user_cabinet/my_coins.html', context)
 
