@@ -8,6 +8,7 @@ from io import BytesIO
 from django.core.files import File
 from django.urls import reverse
 from django.conf import settings
+from django.core.mail import send_mail
 
 
 class UserProfile(models.Model):
@@ -298,8 +299,44 @@ class Message(models.Model):
     is_read = models.BooleanField(default=False)
     topic = models.CharField(default='without topic', max_length=128)
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        if is_new:
+            try:
+                subject = f'Нове повідомлення на CollectoHub: {self.topic}'
+                message = f'Ви отримали нове повідомлення від {self.author.username}:\n\n{self.text}'
+                from_email = settings.DEFAULT_FROM_EMAIL
+                recipient_list = [self.recipient.email]
+                
+                send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+            except Exception:
+                pass  # Ігноруємо помилки відправки, щоб не блокувати збереження повідомлення
+
     def __str__(self):
         return f"{self.author}: {self.topic}"
 
     class Meta:
         ordering = ['-created']
+
+
+class UserSurvey(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='surveys')
+    created = models.DateTimeField(auto_now_add=True)
+    
+    # Інтереси щодо монет
+    year_from = models.IntegerField(blank=True, null=True, help_text='Рік початку діапазону')
+    year_to = models.IntegerField(blank=True, null=True, help_text='Рік кінця діапазону')
+    interested_materials = models.CharField(max_length=200, blank=True, choices=material_choices, help_text='Матеріали монет')
+    interested_continents = models.ManyToManyField(Continent, blank=True, related_name='interested_users')
+    interested_countries = models.ManyToManyField(Country, blank=True, related_name='interested_users')
+    additional_notes = models.TextField(blank=True, help_text='Додаткові примітки')
+
+    class Meta:
+        verbose_name = 'Опитування користувача'
+        verbose_name_plural = 'Опитування користувачів'
+        ordering = ['-created']
+
+    def __str__(self):
+        return f'Опитування {self.user.username} від {self.created.strftime("%d.%m.%Y")}'
