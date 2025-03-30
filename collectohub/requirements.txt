@@ -17,3 +17,4 @@ urllib3==2.2.2
 uWSGI==2.0.26
 whitenoise==6.7.0
 django-rest-framework
+qrcode[pil]

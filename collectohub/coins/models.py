@@ -3,6 +3,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from django.urls import reverse
+from django.conf import settings
 
 
 class UserProfile(models.Model):
@@ -99,9 +104,6 @@ class Country(models.Model):
         verbose_name = "Country"
         verbose_name_plural = "Countries"
 
-    def get_active_coins(self):
-        return Coin.objects.filter(country=self, status="a")
-
     def __str__(self):
         return self.name
 
@@ -148,6 +150,7 @@ class Coin(models.Model):
     box = models.ForeignKey('Box', on_delete=models.SET_NULL, blank=True, null=True, related_name='coins')
     status = models.CharField(max_length=1, choices=status_choices_coin, default='a')
     views_counter = models.IntegerField(default=0)
+    qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Coin'
@@ -158,7 +161,37 @@ class Coin(models.Model):
         return f'{self.country.name} - {self.denomination} - {self.year}'
 
     def save(self, *args, **kwargs):
-        if self.pk:  # If this is an update
+        if not self.qr_code and self.pk:  # Generate QR code only if it doesn't exist and object has pk
+            # Get the absolute URL for the coin
+            base_url = getattr(settings, 'SITE_URL', 'https://collectohub.co.uk')
+            absolute_url = f"{base_url}/coin/{self.pk}/"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(absolute_url)
+            qr.make(fit=True)
+            
+            # Create PIL image
+            qr_image = qr.make_image(fill_color="black", back_color="white")
+            
+            # Save QR code image
+            buffer = BytesIO()
+            qr_image.save(buffer, format='PNG')
+            
+            # Create Django file and save to model
+            filename = f'qr_coin_{self.pk}.png'
+            self.qr_code.save(
+                filename,
+                File(buffer),
+                save=False
+            )
+            
+        if self.pk:
             old_coin = Coin.objects.get(pk=self.pk)
             if old_coin.box is None and self.box is not None:
                 # Check for active MultiOffers containing this coin
