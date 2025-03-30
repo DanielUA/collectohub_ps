@@ -45,3 +45,7 @@ class OfferAdmin(admin.ModelAdmin):
 @admin.register(MultiOffer)
 class MultiOfferAdmin(admin.ModelAdmin):
     list_display = ['id']
+
+@admin.register(UserSurvey)
+class UserSurveyAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created']
