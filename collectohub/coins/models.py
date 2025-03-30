@@ -159,9 +159,24 @@ class Coin(models.Model):
 
     def __str__(self):
         return f'{self.country.name} - {self.denomination} - {self.year}'
+    
+    def delete(self, *args, **kwargs):
+        # Delete QR code image if it exists
+        if self.qr_code:
+            self.qr_code.delete(save=False)
+        super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        if not self.qr_code and self.pk:  # Generate QR code only if it doesn't exist and object has pk
+        if self.pk:
+            try:
+                old_coin = Coin.objects.get(pk=self.pk)
+                # Delete QR code if field is cleared
+                if old_coin.qr_code and not self.qr_code:
+                    old_coin.qr_code.delete(save=False)
+            except Coin.DoesNotExist:
+                pass
+
+        if not self.qr_code and self.pk:
             # Get the absolute URL for the coin
             base_url = getattr(settings, 'SITE_URL', 'https://collectohub.co.uk')
             absolute_url = f"{base_url}/coin/{self.pk}/"
