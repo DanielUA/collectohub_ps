@@ -124,7 +124,7 @@
                {% if user.is_authenticated and user != coin.owner %} 
                <form action="{% url 'coins:offer-detail' %}" method="post">
                    {% csrf_token %}
-                   <input class="btn btn-primary" type="submit" value="make offer">
+                   <input class="btn btn-primary" type="submit" value="make swap">
                    <input type="hidden" name="coin_id" value="{{ coin.id }}">
                 </form>
                 {% endif %}    
