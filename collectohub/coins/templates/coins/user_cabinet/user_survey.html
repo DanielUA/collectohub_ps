@@ -1,0 +1,235 @@
+{% extends "coins/user_cabinet/base_user_cabinet.html" %}
+
+{% block user_page_content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h2>What are you looking for in your collection?</h2>
+        
+    <!-- Add Select2 CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <form method="post" class="needs-validation" novalidate>
+      {% csrf_token %}
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="year_from" class="form-label">Start Year Range</label>
+          <input type="number" 
+                 class="form-control" 
+                 id="year_from" 
+                 name="year_from" 
+                 value="{{ form_data.year_from }}" 
+                 required
+                 min="1000"
+                 max="9999"
+                 pattern="\d{4}">
+          <div class="invalid-feedback">
+            Please enter a year in YYYY format (4 digits).
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <label for="year_to" class="form-label">End Year Range</label>
+          <input type="number" 
+                 class="form-control" 
+                 id="year_to" 
+                 name="year_to" 
+                 value="{{ form_data.year_to }}" 
+                 required
+                 min="1000"
+                 max="9999"
+                 pattern="\d{4}">
+          <div class="invalid-feedback">
+            Please enter a year in YYYY format (4 digits).
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="interested_materials" class="form-label">Coin Materials</label>
+        <select class="form-select" id="interested_materials" name="interested_materials" required>
+          <option value="">Select material</option>
+          {% for key, value in material_choices %}
+            <option value="{{ key }}" {% if form_data.interested_materials == key %}selected{% endif %}>{{ value }}</option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          Please select a material.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="interested_continents" class="form-label">Continents</label>
+        <select class="form-select select2-multiple" 
+                id="interested_continents" 
+                name="interested_continents" 
+                multiple="multiple"
+                data-placeholder="Select continents">
+          {% for continent in continents %}
+            <option value="{{ continent.id }}" 
+                    {% if continent.id in form_data.interested_continents %}selected{% endif %}>
+              {{ continent.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="interested_countries" class="form-label">Countries</label>
+        <select class="form-select select2-multiple" 
+                id="interested_countries" 
+                name="interested_countries" 
+                multiple="multiple"
+                data-placeholder="Select countries">
+          {% for country in countries %}
+            <option value="{{ country.id }}" 
+                    {% if country.id in form_data.interested_countries %}selected{% endif %}>
+              {{ country.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="additional_notes" class="form-label">Additional Notes</label>
+        <textarea class="form-control" 
+                  id="additional_notes" 
+                  name="additional_notes" 
+                  rows="3">{{ form_data.additional_notes }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+  </div>
+  </div>
+
+  <script>
+    // Initialize Select2
+    $(document).ready(function() {
+      $('.select2-multiple').select2({
+        width: '100%',
+        placeholder: 'Select options',
+        allowClear: true,
+        language: {
+          noResults: function() {
+            return "No results found";
+          },
+          searching: function() {
+            return "Searching...";
+          }
+        },
+        templateResult: formatOption,
+        templateSelection: formatOptionSelection
+      });
+    });
+
+    function formatOption(option) {
+      if (!option.id) {
+        return option.text;
+      }
+      // Check if option is already selected
+      var $select = $(option.element).closest('select');
+      var selected = $select.val() || [];
+      
+      // If option is already selected, don't show it in dropdown
+      if (selected.includes(option.id.toString())) {
+        return null;
+      }
+      
+      return $('<span style="padding: 5px;">' + option.text + '</span>');
+    }
+
+    function formatOptionSelection(option) {
+      if (!option.id) {
+        return option.text;
+      }
+      return option.text;
+    }
+
+    // Bootstrap 5 validation
+    (function () {
+      'use strict'
+      var forms = document.querySelectorAll('.needs-validation')
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            // Custom year validation
+            var yearFrom = document.getElementById('year_from');
+            var yearTo = document.getElementById('year_to');
+            
+            if (yearFrom.value.length !== 4 || yearTo.value.length !== 4) {
+              event.preventDefault();
+              event.stopPropagation();
+              if (yearFrom.value.length !== 4) {
+                yearFrom.setCustomValidity('Year must contain 4 digits');
+              }
+              if (yearTo.value.length !== 4) {
+                yearTo.setCustomValidity('Year must contain 4 digits');
+              }
+            } else {
+              yearFrom.setCustomValidity('');
+              yearTo.setCustomValidity('');
+            }
+            
+            if (!form.checkValidity()) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+          }, false)
+        })
+    })()
+  </script>
+
+  <style>
+    {% comment %} .select2-container {
+      width: 100% !important;
+    }
+
+    .select2-container .select2-selection--multiple {
+      min-height: 38px;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+    } {% endcomment %}
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+      background-color: #0d6efd;
+      border: none;
+      color: white;
+      {% comment %} padding: 2px 8px;
+      margin: 4px;
+      border-radius: 4px; {% endcomment %}
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+      color: white;
+      margin-right: 5px;
+      border-right: none;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        background-color: transparent;
+        color: #dc3545;
+    }
+        
+    {% comment %} 
+    .select2-dropdown {
+      border: 1px solid #ced4da;
+    }
+
+    .select2-search__field {
+      padding: 8px !important;
+    }
+
+    .select2-results__option {
+      padding: 8px;
+    }
+
+    .select2-results__option--highlighted {
+      background-color: #0d6efd !important;
+    } {% endcomment %}
+  </style>
+{% endblock %} 

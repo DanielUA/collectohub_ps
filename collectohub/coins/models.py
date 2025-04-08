@@ -169,6 +169,8 @@ class Coin(models.Model):
         super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        
         if self.pk:
             try:
                 old_coin = Coin.objects.get(pk=self.pk)
