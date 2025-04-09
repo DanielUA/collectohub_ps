@@ -694,7 +694,12 @@ def coin_change_status(request):
     if coins:
         coins = Coin.objects.filter(id__in=coins)
         if status in ['a', 'n', 'v', 'w']:
-            coins.update(status=status)
+            if status == 'v':
+                tracking_number = request.POST.get('tracking_number')
+                if tracking_number:
+                    coins.update(status=status, tracking_number=tracking_number)
+            else:
+                coins.update(status=status)
     
     # Отримуємо сторінку, з якої прийшов запит
     referer_url = request.META.get('HTTP_REFERER')
