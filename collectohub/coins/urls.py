@@ -27,6 +27,7 @@ urlpatterns = [
     path('create/account/edit/', views.update_account, name='edit-account'),
     path('user/cabinet/', views.UserCabinetView.as_view(), name='user-cabinet'),
     path('user/cabinet/coins/', views.UserCabinetCoinsView.as_view(), name='user-cabinet-coins'),
+    path('user/cabinet/coins-on-verification/', views.UserCabinetCoinsOnVerificationView.as_view(), name='user-cabinet-coins-on-verification'),
     path('user/cabinet/exchanged-coins/', views.UserCabinetExchangedCoinsView.as_view(), name='user-cabinet-exchanged-coins'),
     path('user/cabinet/wait-for-delivery/', views.UserCabinetWaitForDeliveryView.as_view(), name='user-cabinet-wait-for-delivery'),
     path('user/cabinet/sent/', views.UserCabinetSentView.as_view(), name='user-cabinet-sent'),

@@ -572,7 +572,29 @@ class UserCabinetCoinsView(View):
         }
             
         return render(request, 'coins/user_cabinet/my_coins.html', context)
+    
+    
+class UserCabinetCoinsOnVerificationView(View):
+    @staticmethod
+    def get(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('index')
+        
+        coins = Coin.objects.filter(owner=request.user, status='v')
+        
+        paginator = Paginator(coins, 12)
+        page = request.GET.get("page", 1)
 
+        try:
+            coins = paginator.page(page)
+        except PageNotAnInteger:
+            coins = paginator.page(1)
+        except EmptyPage:
+            coins = paginator.page(paginator.num_pages)
+            
+        context = { 'coins': coins }
+            
+        return render(request, 'coins/user_cabinet/coins_on_verification.html', context)
 
 class UserCabinetExchangedCoinsView(View):
     @staticmethod
@@ -671,7 +693,7 @@ def coin_change_status(request):
     
     if coins:
         coins = Coin.objects.filter(id__in=coins)
-        if status in ['a', 'n', 'w']:
+        if status in ['a', 'n', 'v', 'w']:
             coins.update(status=status)
     
     # Отримуємо сторінку, з якої прийшов запит
