@@ -25,6 +25,7 @@ from .sterializers import *
 from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
 
 
 class IndexView(ListView):
@@ -352,8 +353,7 @@ def create_new_account(request):
     UserProfile.objects.create(user=new_user, phone=phone, postcode=postcode, addres=addres, city=city,
                                 user_pic=request.FILES.get('user_picture'))
     login(request, new_user)
-
-    return HttpResponseRedirect(reverse('coins:index'))
+    return HttpResponseRedirect(reverse('coins:user-survey'))  # Redirect to the survey page
 
 @login_required
 def update_account(request):
@@ -572,7 +572,29 @@ class UserCabinetCoinsView(View):
         }
             
         return render(request, 'coins/user_cabinet/my_coins.html', context)
+    
+    
+class UserCabinetCoinsOnVerificationView(View):
+    @staticmethod
+    def get(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('index')
+        
+        coins = Coin.objects.filter(owner=request.user, status='v')
+        
+        paginator = Paginator(coins, 12)
+        page = request.GET.get("page", 1)
 
+        try:
+            coins = paginator.page(page)
+        except PageNotAnInteger:
+            coins = paginator.page(1)
+        except EmptyPage:
+            coins = paginator.page(paginator.num_pages)
+            
+        context = { 'coins': coins }
+            
+        return render(request, 'coins/user_cabinet/coins_on_verification.html', context)
 
 class UserCabinetExchangedCoinsView(View):
     @staticmethod
@@ -671,8 +693,13 @@ def coin_change_status(request):
     
     if coins:
         coins = Coin.objects.filter(id__in=coins)
-        if status in ['a', 'n', 'w']:
-            coins.update(status=status)
+        if status in ['a', 'n', 'v', 'w']:
+            if status == 'v':
+                tracking_number = request.POST.get('tracking_number')
+                if tracking_number:
+                    coins.update(status=status, tracking_number=tracking_number)
+            else:
+                coins.update(status=status)
     
     # Отримуємо сторінку, з якої прийшов запит
     referer_url = request.META.get('HTTP_REFERER')
@@ -1206,3 +1233,76 @@ def search_coin(request):
 
     else:
         return HttpResponseRedirect(reverse('coins:index'))
+
+
+class UserSurveyView(View):
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        # Try to get existing survey
+        try:
+            existing_survey = UserSurvey.objects.get(user=request.user)
+            form_data = {
+                'year_from': existing_survey.year_from,
+                'year_to': existing_survey.year_to,
+                'interested_materials': existing_survey.interested_materials,
+                'interested_continents': [c.id for c in existing_survey.interested_continents.all()],
+                'interested_countries': [c.id for c in existing_survey.interested_countries.all()],
+                'additional_notes': existing_survey.additional_notes,
+            }
+        except UserSurvey.DoesNotExist:
+            form_data = {
+                'year_from': '',
+                'year_to': '',
+                'interested_materials': '',
+                'interested_continents': [],
+                'interested_countries': [],
+                'additional_notes': '',
+            }
+
+        context = {
+            'form_data': form_data,
+            'material_choices': material_choices,
+            'continents': Continent.objects.all(),
+            'countries': Country.objects.all(),
+        }
+        return render(request, 'coins/user_cabinet/user_survey.html', context)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        form_data = {
+            'year_from': request.POST.get('year_from'),
+            'year_to': request.POST.get('year_to'),
+            'interested_materials': request.POST.get('interested_materials'),
+            'interested_continents': request.POST.getlist('interested_continents'),
+            'interested_countries': request.POST.getlist('interested_countries'),
+            'additional_notes': request.POST.get('additional_notes'),
+        }
+
+        # Validate years
+        if not (form_data['year_from'].isdigit() and len(form_data['year_from']) == 4 and
+                form_data['year_to'].isdigit() and len(form_data['year_to']) == 4):
+            context = {
+                'form_data': form_data,
+                'material_choices': material_choices,
+                'continents': Continent.objects.all(),
+                'countries': Country.objects.all(),
+                'error': 'Роки повинні містити 4 цифри'
+            }
+            return render(request, 'coins/user_cabinet/user_survey.html', context)
+
+        # Update or create survey
+        user_survey, created = UserSurvey.objects.update_or_create(
+            user=request.user,
+            defaults={
+                'year_from': form_data['year_from'],
+                'year_to': form_data['year_to'],
+                'interested_materials': form_data['interested_materials'],
+                'additional_notes': form_data['additional_notes']
+            }
+        )
+        
+        # Update many-to-many relationships
+        user_survey.interested_continents.set(Continent.objects.filter(id__in=form_data['interested_continents']))
+        user_survey.interested_countries.set(Country.objects.filter(id__in=form_data['interested_countries']))
+        
+        return HttpResponseRedirect(reverse('coins:user-survey'))

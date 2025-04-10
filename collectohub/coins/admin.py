@@ -22,9 +22,10 @@ class CoinAdmin(admin.ModelAdmin):
         'circulation',
         'owner',
         'status',
+        'tracking_number',
         ]
     list_filter = [
-        'box',
+        'status',
     ]
     search_fields = [
         'denomination',

@@ -34,7 +34,7 @@
                                        name="denomination" 
                                        pattern="^\d+\s[A-Za-z]+(\s[A-Za-z]+)*$"
                                        title="Format: number followed by single space and word(s) (e.g. '25 penc' or '1 pound sterling')"
-                                       value="{{ coin.denomination }}"
+                                       value="{{ coin.denomination|title }}"
                                        required>
                                 <div class="form-text">Examples: 25 penc, 1 pound sterling</div>
                             </div>

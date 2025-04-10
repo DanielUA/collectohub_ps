@@ -48,6 +48,9 @@ class UserProfile(models.Model):
     def active_coins(self):
         return self.user.coins.filter(status='a')
 
+    def coins_on_verification(self):
+        return self.user.coins.filter(status='v')
+
     def exchanged_coins(self):
         return self.user.coins.filter(status='e')
 
@@ -130,7 +133,7 @@ material_choices = [
     ("titanium", "ti")
 ]
 
-status_choices_coin = [('a', 'active'), ('n', 'not active'), ('e', 'exchanged'), ('w', 'wait for delivery'), ('s', 'sent')]
+status_choices_coin = [('a', 'active'), ('n', 'not active'), ('e', 'exchanged'), ('v', 'sent for verification'), ('w', 'wait for delivery'), ('s', 'sent')]
 
 
 class Coin(models.Model):
@@ -169,6 +172,8 @@ class Coin(models.Model):
         super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        
         if self.pk:
             try:
                 old_coin = Coin.objects.get(pk=self.pk)
