@@ -35,7 +35,7 @@
                 </a>
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title mb-0">{{ coin.denomination }} {{ coin.year }}</h6>
+                        <h6 class="card-title mb-0">{{ coin.denomination|title }} {{ coin.year }}</h6>
                         {% if coin.box %}
                         <span class="text-success d-flex align-items-center gap-1" title="Підтверджена">
                             <i class="bi bi-check-circle-fill"></i>

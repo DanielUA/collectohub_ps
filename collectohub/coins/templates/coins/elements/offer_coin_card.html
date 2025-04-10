@@ -8,7 +8,7 @@
             {% endif %}
         </a>
         <div class="card-body p-2">
-            <h6 class="card-title">{{ coin.denomination }} {{ coin.year }}</h6>
+            <h6 class="card-title">{{ coin.denomination|title }} {{ coin.year }}</h6>
             <div class="d-flex align-items-center gap-2">
                 {% if coin.box %}
                 <span class="text-success d-flex align-items-center" title="Підтверджена">
