@@ -697,9 +697,19 @@ def coin_change_status(request):
             if status == 'v':
                 tracking_number = request.POST.get('tracking_number')
                 if tracking_number:
-                    coins.update(status=status, tracking_number=tracking_number)
+                    coins.update(status=status, tracking_number=tracking_number, sent_for_verification_date=timezone.now())
             else:
-                coins.update(status=status)
+                for coin in coins:
+                    if coin.status == 'v':
+                        #перевірка чи минуло 24 години
+                        if coin.sent_for_verification_date:
+                            if coin.sent_for_verification_date > timezone.now() - timedelta(hours=24):
+                                coin.status = status
+                                coin.sent_for_verification_date = None
+                                coin.save()
+                    else:
+                        coin.status = status
+                        coin.save()
     
     # Отримуємо сторінку, з якої прийшов запит
     referer_url = request.META.get('HTTP_REFERER')

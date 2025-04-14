@@ -153,6 +153,7 @@ class Coin(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='coins')
     box = models.ForeignKey('Box', on_delete=models.SET_NULL, blank=True, null=True, related_name='coins')
     status = models.CharField(max_length=1, choices=status_choices_coin, default='a')
+    sent_for_verification_date = models.DateTimeField(blank=True, null=True)
     views_counter = models.IntegerField(default=0)
     qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
     tracking_number = models.CharField(max_length=50, blank=True, null=True, help_text='Tracking number for coin verification shipment')
