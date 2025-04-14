@@ -108,6 +108,9 @@ class Country(models.Model):
         verbose_name = "Country"
         verbose_name_plural = "Countries"
 
+    def get_active_coins(self):
+        return Coin.objects.filter(country=self, status="a")
+
     def __str__(self):
         return self.name
 
