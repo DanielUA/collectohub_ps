@@ -32,9 +32,16 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     />
-    {% block style %}{% endblock %} 
+    {% block style %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'coins/cookie-consent.css' %}">
 </head>
 <body>
+    <div id="cookie-consent-banner" class="cookie-banner" style="display: none;">
+        <div class="cookie-content">
+            <p>This website uses cookies to ensure you get the best experience on our website.</p>
+            <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'coins:index'%}">
@@ -178,5 +185,6 @@
     <script
       src="{% static 'coins/base.js' %}"
     ></script>
+    <script src="{% static 'coins/cookie-consent.js' %}"></script>
 </body>
 </html>

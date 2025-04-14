@@ -28,10 +28,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 
 
+class HomePageView(View):
+    @staticmethod
+    def get(request, *args, **kwargs):
+        return render(request, 'coins/index.html')
+    
+
 class IndexView(ListView):
     model = Coin
     context_object_name = "coin_list"
-    template_name = 'coins/index.html'
+    template_name = 'coins/all_coins_page.html'
     extra_context = {
         "continent_list": Continent.objects.all().order_by("name"),
     }
