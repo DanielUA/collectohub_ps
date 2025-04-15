@@ -1,4 +1,7 @@
-{% extends 'coins/base.html' %} {% block title %} Create account {% endblock %} {% block content %}
+{% extends 'coins/base.html' %} 
+{% block robots %}noindex, nofollow{% endblock %}
+{% block title %} Create account {% endblock %} 
+{% block content %}
 <h1 class="text-center">Create account</h1>
 <form class="row g-3 needs-validation m-auto" style="max-width: 600px;" novalidate action="{% url 'coins:create-new-account' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}

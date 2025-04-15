@@ -23,7 +23,7 @@
             <div class="carousel-inner">
               <div class="carousel-item active">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_front.url }}" class="d-block w-100" alt="...">
+                <img src="{{ coin.img_front.url }}" class="d-block w-100" alt="Front side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -34,7 +34,7 @@
               </div>
               <div class="carousel-item">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_back.url }}" class="d-block w-100" alt="...">
+                <img src="{{ coin.img_back.url }}" class="d-block w-100" alt="Back side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -46,7 +46,7 @@
               {% if coin.img_add_1 %}
               <div class="carousel-item">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_add_1.url }}" class="d-block w-100" alt="...">
+                <img src="{{ coin.img_add_1.url }}" class="d-block w-100" alt="Additional view 1 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -59,7 +59,7 @@
               {% if coin.img_add_2 %}
               <div class="carousel-item">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_add_2.url }}" class="d-block w-100" alt="...">
+                <img src="{{ coin.img_add_2.url }}" class="d-block w-100" alt="Additional view 2 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -83,19 +83,19 @@
       
         <div class="row mt-2">
             <div class="col-3">            
-            <img id='img-front' class="w-100" src="{{ coin.img_front.url }}" alt="">     
+            <img id='img-front' class="w-100" src="{{ coin.img_front.url }}" alt="Front side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">     
             </div>
             <div class="col-3">
-                <img id="img-back" class="w-100" src="{{ coin.img_back.url }}" alt="">                
+                <img id="img-back" class="w-100" src="{{ coin.img_back.url }}" alt="Back side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">                
             </div>
             {% if coin.img_add_1 %}
             <div class="col-3">
-                <img id="img-add-1" class="w-100" src="{{ coin.img_add_1.url }}" alt="">                
+                <img id="img-add-1" class="w-100" src="{{ coin.img_add_1.url }}" alt="Additional view 1 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">                
             </div>
             {% endif %} 
             {% if coin.img_add_2 %}
             <div class="col-3">
-                <img id="img-add-2" class="w-100" src="{{ coin.img_add_2.url }}" alt="">                
+                <img id="img-add-2" class="w-100" src="{{ coin.img_add_2.url }}" alt="Additional view 2 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">                
             </div>
             {% endif %}
         </div>
@@ -147,7 +147,7 @@
 
 <div id="myModal" class="modal">
   <div class="modal-content">
-    <img src="" id="img-modal" alt="">
+    <img src="" id="img-modal" alt="Enlarged view of coin">
   </div>
 </div>
 {% comment %} {% include 'coins/multi_offer.html' %} {% endcomment %}

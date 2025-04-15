@@ -1,4 +1,7 @@
-{% extends 'coins/base.html' %} {% block title %} Change passwor {% endblock %} {% block content %}
+{% extends 'coins/base.html' %} 
+{% block robots %}noindex, nofollow{% endblock %}
+{% block title %} Change passwor {% endblock %} 
+{% block content %}
 <div class="d-flex flex-column align-items-center">
     <h3 class="mb-4">Sing in</h3>
     {% if errors %}

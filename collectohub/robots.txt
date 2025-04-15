@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+Allow: /coin/*/
+Allow: /continent/*/
+Allow: /country/*/
+Allow: /about-me/
+Allow: /owner-public/*/
+
+Disallow: /sign/
+Disallow: /user/cabinet/
+Disallow: /create/account/
+Disallow: /offer/
+Disallow: /make/offer/
+Disallow: /coins/send/
+Disallow: /message/
+Disallow: /accounts/
+Disallow: /api/
+Disallow: /search/
+Disallow: /user-survey/
+
+# Prevent indexing of admin panel
+Disallow: /admin/
+
+# Add sitemap location
+Sitemap: https://your-domain.com/sitemap.xml 

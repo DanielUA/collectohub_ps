@@ -1,113 +1,343 @@
-{% extends 'coins/base.html' %} {% block title %} Collecto Hub {% endblock %} {% block content %}
-<div class="row">
-    <div class="col-md-3 mb-3">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container-fluid">
-                <!-- Кнопка для мобільного меню -->
-                <button class="mb-3 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <!-- Назва меню -->
-                <h6 class="d-lg-none">Filters</h6>
+{% extends 'coins/base.html' %} 
+{% load static %}
+{% block title %} Collecto Hub {% endblock %} 
+{% block content %}
 
-                <!-- Блок з меню -->
-                <div class="collapse navbar-collapse" id="navbarMenu">
-                    <ol class="list-group w-100">
-                        {% for continent in continent_list %}
-                        <a href="{% url 'coins:continent-detail' continent.id %}" class="text text-decoration-none">
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div class="fw-bold">{{ continent.name }}</div>
-                                </div>
-                            </li>
-                        </a>
-                        {% endfor %}
-                        <li class="list-group-item">
-                            <label>Change years:</label>
-                            <div class="d-flex gap-3">
-                                <input name="min_year" type="number" class="form-control" id="yearInput" min="{{min_year}}" max="{{max_year}}" value="{{min_year}}">
-                                <input name="max_year" type="number" class="form-control" id="yearInput" min="{{min_year}}" max="{{max_year}}" value="{{max_year}}">
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Change denomination
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                    {% for i in list_denomination %}
-                                    <li class="dropdown-item">
-                                        <div class="form-check">
-                                            <input name="denomination" class="form-check-input" type="checkbox" value="{{ i }}" id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">
-                                                {{ i }}
-                                            </label>
-                                        </div>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="d-flex gap-3">
-                                <button class="btn btn-primary confirm_filters">Confirm filters</button>
-                                <button id="resetFilters" class="btn btn-outline-danger" style="display: none;"><i class="bi bi-arrow-clockwise"></i></button>
-                            </div>
-                        </li>
-                    </ol>
+<div class="container-fluid px-0">
+    <!-- Hero Section with Full-width Background -->
+    <div class="bg-gradient-primary text-white py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h1 class="display-3 fw-bold mb-3">Discover the World of Coin Collecting</h1>
+                    <p class="lead fs-4 mb-4">Join CollectoHub and connect with fellow collectors to trade, learn, and grow your collection.</p>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'coins:index' %}" class="btn btn-success btn-lg rounded-pill px-4 shadow-sm">Start Swapping</a>
+                        <a href="#about" class="btn btn-outline-light btn-lg rounded-pill px-4">Learn More</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'coins/img/home_page_photo.png' %}" class="img-fluid rounded-lg shadow-lg" alt="CollectoHub coin collection">
                 </div>
             </div>
-        </nav>
+        </div>
     </div>
-    <div class="col-md-9">
-        <div class="row">
-            {% for coin in page_obj %}
-                {% include 'coins/elements/coin_card.html' with coin=coin %}
-            {% endfor %}
+
+    <!-- Features Section -->
+    <div class="container mb-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Why Choose CollectoHub?</h2>
+            <p class="lead text-muted">The ultimate platform for coin collectors worldwide</p>
         </div>
 
-        <div class="d-flex justify-content-center">
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% endif %} {% for num in page_obj.paginator.page_range %} {% if num == 1 or num == page_obj.paginator.num_pages %}
-                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                    {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                    {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                    {% endif %} {% endfor %} {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle mb-4">
+                            <i class="bi bi-coin fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Professional Listings</h3>
+                        <p class="text-muted">Send us your coins for expert photography and detailed descriptions that showcase their true value.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-success text-white rounded-circle mb-4">
+                            <i class="bi bi-arrow-left-right fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Flexible Trading</h3>
+                        <p class="text-muted">Create custom deals with multiple coins, negotiate terms, and find the perfect exchange for your collection.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-info text-white rounded-circle mb-4">
+                            <i class="bi bi-lightning-fill fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Instant Connections</h3>
+                        <p class="text-muted">Connect directly with collectors worldwide and complete trades without unnecessary delays.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="bg-light py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="display-5 fw-bold mb-4">How CollectoHub Works</h2>
+                    <div class="process-steps">
+                        <div class="process-step d-flex mb-4">
+                            <div class="process-number bg-primary text-white rounded-circle me-3">1</div>
+                            <div>
+                                <h4>Register & List</h4>
+                                <p class="text-muted">Create your account and start listing your coins, or send them to us for professional presentation.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="process-number bg-primary text-white rounded-circle me-3">2</div>
+                            <div>
+                                <h4>Browse & Connect</h4>
+                                <p class="text-muted">Explore collections from fellow enthusiasts and find coins that interest you.</p>
+                            </div>
+                        </div>
+                        <div class="process-step d-flex">
+                            <div class="process-number bg-primary text-white rounded-circle me-3">3</div>
+                            <div>
+                                <h4>Negotiate & Swap</h4>
+                                <p class="text-muted">Make offers, negotiate terms, and complete trades securely through our platform.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body p-4">
+                            <h3 class="card-title mb-4">Ready to Start Swapping?</h3>
+                            <p class="card-text">Turn your duplicate coins into new treasures for your collection. Join thousands of collectors already trading on CollectoHub.</p>
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="user-avatars me-3">
+                                    <!-- Placeholder for user avatars -->
+                                    <div class="avatar-group">
+                                        <span class="avatar bg-primary">JD</span>
+                                        <span class="avatar bg-success">MK</span>
+                                        <span class="avatar bg-info">TS</span>
+                                        <span class="avatar bg-warning">+</span>
+                                    </div>
+                                </div>
+                                <div class="user-count">
+                                    <p class="mb-0"><strong>1,500+</strong> active collectors</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Me Section -->
+    <div class="container mb-5" id="about">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h2 class="display-5 fw-bold text-center">My Coin Collecting Journey</h2>
+                <p class="lead text-center text-muted mb-5">The story behind CollectoHub</p>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="row g-0">
+                <div class="col-md-4 position-relative">
+                    <img src="{% static 'coins/img/photo_2.jpg' %}" class="img-cover h-100 w-100 object-fit-cover" alt="My coin collection">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body p-4 p-lg-5">
+                        <h3 class="card-title mb-4">Hello, I'm Danyil</h3>
+                        <div class="scrollable-content" style="max-height: 400px; overflow-y: auto;">
+                            <p>I've been passionate about coin collecting since childhood. My journey began
+                            with a few foreign coins that my mother had, which sparked my interest in numismatics. Over time, I
+                            shared this hobby with my classmates, and we would swap coins with each other.</p>
+
+                            <p>I bought my first coin album and started collecting coins from various places, even purchasing them
+                            through local classifieds. Then, with the advent of the internet, my hobby evolved. I gained access to
+                            online catalogs, which helped me sort coins by century, continent, and country.</p>
+
+                            <p>As my collection grew, I began buying and reselling coins. I also started purchasing coins directly from
+                            the national bank, including participating in an auction for limited-edition coins.</p>
+
+                            <p>Unfortunately, due to the war in Ukraine, I had to leave much of my collection behind when I moved
+                            to the UK. But once I settled here, I decided to pick up my passion for coin collecting again. I even
+                            learned programming and created a website, CollectoHub, dedicated to coin exchanges among
+                            collectors.</p>
+
+                            <p>I also had the opportunity to attend a coin exhibition in London, where I distributed leaflets about my
+                            website and met some fascinating people. From time to time, I win storage units at auctions, and in
+                            one memorable instance, I found a suitcase filled with various items, including a small bag with
+                            around 100 coins—about 20 of them were silver, dating back to the late 19th and early 20th century
+                            from old England.</p>
+
+                            <p>My journey with coins has been full of surprises, and I'm always eager to share new discoveries and
+                            experiences with fellow collectors. This site will serve as a space for me to document and share all
+                            things related to coin collecting, from historical pieces to modern finds, and my passion for keeping
+                            this wonderful hobby alive.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clean & Save Section -->
+    <div class="bg-light py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold">Coin Care & Preservation</h2>
+                    <p class="lead text-muted">Expert tips to maintain your collection's value</p>
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <div class="position-relative">
+                        <img src="{% static 'coins/img/photo_1.jpg' %}" class="img-fluid rounded-lg shadow-lg" alt="Coin cleaning process">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-overlay rounded-lg"></div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="h3 mb-4">Lessons From Years of Experience</h3>
+                            <p>Throughout my coin collecting journey, I've gained a fair amount of experience with cleaning and
+                            preserving coins. Here's what I've learned through trial and error:</p>
+                            
+                            <div class="accordion mt-4" id="cleaningAccordion">
+                                <div class="accordion-item border-0 mb-3 shadow-sm">
+                                    <h4 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                            Sort Coins by Metal Type
+                                        </button>
+                                    </h4>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#cleaningAccordion">
+                                        <div class="accordion-body">
+                                            It's crucial to categorize coins based on their metal composition before cleaning. Brass, copper, and
+                                            nickel coins are the easiest and safest to clean. Aluminum coins require a different approach, and
+                                            zinc coins are the most challenging—they can be easily damaged if not treated with care.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item border-0 mb-3 shadow-sm">
+                                    <h4 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                            Experiment, but Cautiously
+                                        </button>
+                                    </h4>
+                                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#cleaningAccordion">
+                                        <div class="accordion-body">
+                                            I recommend experimenting only with less rare or valuable coins. Some cleaning methods, such as
+                                            using harsh chemicals, can severely damage the coins if left in the solution for too long. It's better to
+                                            repeat the cleaning process than overexpose the coin to any chemical.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item border-0 shadow-sm">
+                                    <h4 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                            Never Mix Metals in the Same Solution
+                                        </button>
+                                    </h4>
+                                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#cleaningAccordion">
+                                        <div class="accordion-body">
+                                            Always clean coins of different metal types separately. Mixing metals in one solution can cause
+                                            undesirable reactions and damage to the coins.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="container py-5">
+        <div class="card bg-primary text-white border-0 shadow-lg">
+            <div class="card-body p-5 text-center">
+                <h2 class="display-5 fw-bold mb-3">Ready to Join the CollectoHub Community?</h2>
+                <p class="lead mb-4">Connect with collectors worldwide and start trading your coins today!</p>
+                <a href="{% url 'coins:index' %}" class="btn btn-light btn-lg px-5 shadow">Get Started Now</a>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Add custom CSS for new components -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #3a47d5 0%, #00d2ff 100%);
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    
+    .process-number {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .hover-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .img-cover {
+        object-fit: cover;
+    }
+    
+    .bg-gradient-overlay {
+        background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.3));
+    }
+    
+    .avatar-group {
+        display: flex;
+    }
+    
+    .avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: -10px;
+        border: 2px solid white;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(58, 71, 213, 0.1);
+        color: #3a47d5;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+    
+    .rounded-lg {
+        border-radius: 0.5rem;
+    }
+    
+    .scrollable-content::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .scrollable-content::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 3px;
+    }
+</style>
 
 {% endblock %}
