@@ -3,72 +3,118 @@
 {% block title %} Collecto Hub {% endblock %} 
 {% block content %}
 
-<div class="container py-5">
-    <!-- Hero Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <div class="row mb-4 align-items-center">
-                        <div class="col-12 col-md-6 mb-3 mt-3 mb-md-0 text-center text-md-start order-2 order-md-1">
-                            <img src="{% static 'coins/img/home_page_photo.png' %}" class="img-fluid rounded shadow" alt="CollectoHub coin collection">
-                        </div>
-                        <div class="col-12 col-md-6 text-center order-1 order-md-2">
-                            <h1 class="display-4 mb-3 fs-1">🚀 Join CollectoHub and start swapping today!</h1>
-                            <a href="{% url 'coins:index' %}" class="btn btn-success btn-lg">Start now</a>
-                        </div>
+<div class="container-fluid px-0">
+    <!-- Hero Section with Full-width Background -->
+    <div class="bg-gradient-primary text-white py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h1 class="display-3 fw-bold mb-3">Discover the World of Coin Collecting</h1>
+                    <p class="lead fs-4 mb-4">Join CollectoHub and connect with fellow collectors to trade, learn, and grow your collection.</p>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'coins:index' %}" class="btn btn-success btn-lg rounded-pill px-4 shadow-sm">Start Swapping</a>
+                        <a href="#about" class="btn btn-outline-light btn-lg rounded-pill px-4">Learn More</a>
                     </div>
-                    
-                    <h2 class="mb-4">Why CollectoHub?</h2>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'coins/img/home_page_photo.png' %}" class="img-fluid rounded-lg shadow-lg" alt="CollectoHub coin collection">
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 bg-light">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-coin fs-1 text-primary mb-3"></i>
-                                    <div class="h5">✅ List and trade coins</div>
-                                    <p class="mb-0">Send them to us for professional photos and descriptions.</p>
-                                </div>
+    <!-- Features Section -->
+    <div class="container mb-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Why Choose CollectoHub?</h2>
+            <p class="lead text-muted">The ultimate platform for coin collectors worldwide</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle mb-4">
+                            <i class="bi bi-coin fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Professional Listings</h3>
+                        <p class="text-muted">Send us your coins for expert photography and detailed descriptions that showcase their true value.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-success text-white rounded-circle mb-4">
+                            <i class="bi bi-arrow-left-right fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Flexible Trading</h3>
+                        <p class="text-muted">Create custom deals with multiple coins, negotiate terms, and find the perfect exchange for your collection.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-info text-white rounded-circle mb-4">
+                            <i class="bi bi-lightning-fill fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Instant Connections</h3>
+                        <p class="text-muted">Connect directly with collectors worldwide and complete trades without unnecessary delays.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="bg-light py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="display-5 fw-bold mb-4">How CollectoHub Works</h2>
+                    <div class="process-steps">
+                        <div class="process-step d-flex mb-4">
+                            <div class="process-number bg-primary text-white rounded-circle me-3">1</div>
+                            <div>
+                                <h4>Register & List</h4>
+                                <p class="text-muted">Create your account and start listing your coins, or send them to us for professional presentation.</p>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 bg-light">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-arrow-left-right fs-1 text-primary mb-3"></i>
-                                    <div class="h5">✅ Flexible swapping</div>
-                                    <p class="mb-0">Trade one coin for several or negotiate unique deals.</p>
-                                </div>
+                        <div class="process-step d-flex mb-4">
+                            <div class="process-number bg-primary text-white rounded-circle me-3">2</div>
+                            <div>
+                                <h4>Browse & Connect</h4>
+                                <p class="text-muted">Explore collections from fellow enthusiasts and find coins that interest you.</p>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 bg-light">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-lightning-fill fs-1 text-primary mb-3"></i>
-                                    <div class="h5">✅ No waiting</div>
-                                    <p class="mb-0">Just seamless coin exchanges with fellow collectors.</p>
-                                </div>
+                        <div class="process-step d-flex">
+                            <div class="process-number bg-primary text-white rounded-circle me-3">3</div>
+                            <div>
+                                <h4>Negotiate & Swap</h4>
+                                <p class="text-muted">Make offers, negotiate terms, and complete trades securely through our platform.</p>
                             </div>
                         </div>
                     </div>
-
-                    <div class="my-5">
-                        <h2 class="display-5">Swap Coins Easily with CollectoHub! 🪙🔄</h2>
-                        <p class="lead">Have duplicate coins? Turn them into something new!</p>
-                        <p class="fs-5">📌 Plus, check out my blog for tips on coin collecting, cleaning, and rare finds!</p>
-                    </div>
-
-                    <div class="mt-5">
-                        <h2 class="display-5 mb-4">💱 About My Site – "Swap Coins"</h2>
-                        <p class="lead mb-4">CollectoHub is a platform created by a collector for collectors!</p>
-                        
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h3 class="h4 mb-3">🔹 How it works:</h3>
-                                <ul class="list-unstyled">
-                                    <li class="mb-3">Register and start listing your coins OR send them to me for professional photos and descriptions.</li>
-                                    <li class="mb-3">Trade easily—exchange one coin for multiple or negotiate unique swaps.</li>
-                                    <li>No long waits—discover instant trading opportunities with fellow collectors.</li>
-                                </ul>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body p-4">
+                            <h3 class="card-title mb-4">Ready to Start Swapping?</h3>
+                            <p class="card-text">Turn your duplicate coins into new treasures for your collection. Join thousands of collectors already trading on CollectoHub.</p>
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="user-avatars me-3">
+                                    <!-- Placeholder for user avatars -->
+                                    <div class="avatar-group">
+                                        <span class="avatar bg-primary">JD</span>
+                                        <span class="avatar bg-success">MK</span>
+                                        <span class="avatar bg-info">TS</span>
+                                        <span class="avatar bg-warning">+</span>
+                                    </div>
+                                </div>
+                                <div class="user-count">
+                                    <p class="mb-0"><strong>1,500+</strong> active collectors</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -78,28 +124,32 @@
     </div>
 
     <!-- About Me Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h1 class="display-4 mb-4">About Me - My Coin Collecting Journey</h1>
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8 order-md-1 order-2">
-                            <p>Hello, I'm Danyil, and I've been passionate about coin collecting since childhood. My journey began
+    <div class="container mb-5" id="about">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h2 class="display-5 fw-bold text-center">My Coin Collecting Journey</h2>
+                <p class="lead text-center text-muted mb-5">The story behind CollectoHub</p>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="row g-0">
+                <div class="col-md-4 position-relative">
+                    <img src="{% static 'coins/img/photo_2.jpg' %}" class="img-cover h-100 w-100 object-fit-cover" alt="My coin collection">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body p-4 p-lg-5">
+                        <h3 class="card-title mb-4">Hello, I'm Danyil</h3>
+                        <div class="scrollable-content" style="max-height: 400px; overflow-y: auto;">
+                            <p>I've been passionate about coin collecting since childhood. My journey began
                             with a few foreign coins that my mother had, which sparked my interest in numismatics. Over time, I
-                            shared this hobby with my classmates, and we would swap coins with each other. I spent many days
-                            going to markets and flea markets, searching for interesting finds to add to my collection.</p>
+                            shared this hobby with my classmates, and we would swap coins with each other.</p>
 
                             <p>I bought my first coin album and started collecting coins from various places, even purchasing them
                             through local classifieds. Then, with the advent of the internet, my hobby evolved. I gained access to
-                            online catalogs, which helped me sort coins by century, continent, and country. I also started
-                            purchasing coins from specialized auctions and online platforms, attending collector meetups, and
-                            eventually acquiring my first coin album with holders for my growing collection.</p>
+                            online catalogs, which helped me sort coins by century, continent, and country.</p>
 
                             <p>As my collection grew, I began buying and reselling coins. I also started purchasing coins directly from
-                            the national bank, including participating in an auction for limited-edition coins. Although I didn't win
-                            the auction, I was surprised at how much the coins were resold for afterward—sometimes at a
-                            significantly higher price than what they were initially going for.</p>
+                            the national bank, including participating in an auction for limited-edition coins.</p>
 
                             <p>Unfortunately, due to the war in Ukraine, I had to leave much of my collection behind when I moved
                             to the UK. But once I settled here, I decided to pick up my passion for coin collecting again. I even
@@ -116,12 +166,6 @@
                             experiences with fellow collectors. This site will serve as a space for me to document and share all
                             things related to coin collecting, from historical pieces to modern finds, and my passion for keeping
                             this wonderful hobby alive.</p>
-
-                            <p>I'm excited to have you join me on this journey, and I hope you find inspiration, knowledge, and a
-                            community here!</p>
-                        </div>
-                        <div class="col-md-4 order-md-2 order-1 mb-3 mb-md-0">
-                            <img src="{% static 'coins/img/photo_2.jpg' %}" class="img-fluid rounded" alt="My coin collection">
                         </div>
                     </div>
                 </div>
@@ -130,69 +174,170 @@
     </div>
 
     <!-- Clean & Save Section -->
-    <div class="row">
-        <div class="col-12">
-            <h2 class="display-5 mb-4">Clean & Save Your Coins</h2>
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <img src="{% static 'coins/img/photo_1.jpg' %}" class="img-fluid rounded" alt="Coin cleaning process">
-                        </div>
-                        <div class="col-md-8">
-                            Throughout my coin collecting journey, I've gained a fair amount of experience with cleaning and
-                            preserving coins. I'll share with you some of the methods I've tried over the years and what I've
-                            learned through trial and error.
-                            <h3 class="h4 text-primary mt-4">The Beginning</h3>
-                            My first attempt at cleaning coins was simple yet quite primitive—I would rub the coin against
-                            smooth, clean wood. It was a rather interesting way to kill time, though not particularly effective,
-                            and it left me with sore fingers!
-        
-                            <h3 class="h4 text-primary mt-4">Chemical Cleaning and Other Methods</h3>
-                            As I continued collecting, I began experimenting with different household cleaning agents. I also
-                            tried using electrolysis, and at one point, I used more aggressive chemicals. Unfortunately, some
-                            coins didn't survive these experiments, which taught me valuable lessons about the dangers of
-                            certain methods.
-        
-                            <h3 class="h4 text-primary mt-4">What Works Best?</h3>
-                            After much trial and error, I settled on using a rust remover solution. This method has proven to be
-                            more effective and gentle on the coins, preserving their value and appearance. Here are a few
-                            things I've learned over the years:
-        
-                            <div class="mt-4">
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Sort Coins by Metal Type</h5>
-                                        <p class="card-text">It's crucial to categorize coins based on their metal composition before cleaning. Brass, copper, and
-                                        nickel coins are the easiest and safest to clean. Aluminum coins require a different approach, and
-                                        zinc coins are the most challenging—they can be easily damaged if not treated with care.</p>
+    <div class="bg-light py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold">Coin Care & Preservation</h2>
+                    <p class="lead text-muted">Expert tips to maintain your collection's value</p>
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <div class="position-relative">
+                        <img src="{% static 'coins/img/photo_1.jpg' %}" class="img-fluid rounded-lg shadow-lg" alt="Coin cleaning process">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-overlay rounded-lg"></div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="h3 mb-4">Lessons From Years of Experience</h3>
+                            <p>Throughout my coin collecting journey, I've gained a fair amount of experience with cleaning and
+                            preserving coins. Here's what I've learned through trial and error:</p>
+                            
+                            <div class="accordion mt-4" id="cleaningAccordion">
+                                <div class="accordion-item border-0 mb-3 shadow-sm">
+                                    <h4 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                            Sort Coins by Metal Type
+                                        </button>
+                                    </h4>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#cleaningAccordion">
+                                        <div class="accordion-body">
+                                            It's crucial to categorize coins based on their metal composition before cleaning. Brass, copper, and
+                                            nickel coins are the easiest and safest to clean. Aluminum coins require a different approach, and
+                                            zinc coins are the most challenging—they can be easily damaged if not treated with care.
+                                        </div>
                                     </div>
                                 </div>
-        
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Experiment, but Cautiously</h5>
-                                        <p class="card-text">I recommend experimenting only with less rare or valuable coins. Some cleaning methods, such as
-                                        using harsh chemicals, can severely damage the coins if left in the solution for too long. It's better to
-                                        repeat the cleaning process than overexpose the coin to any chemical.</p>
+                                
+                                <div class="accordion-item border-0 mb-3 shadow-sm">
+                                    <h4 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                            Experiment, but Cautiously
+                                        </button>
+                                    </h4>
+                                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#cleaningAccordion">
+                                        <div class="accordion-body">
+                                            I recommend experimenting only with less rare or valuable coins. Some cleaning methods, such as
+                                            using harsh chemicals, can severely damage the coins if left in the solution for too long. It's better to
+                                            repeat the cleaning process than overexpose the coin to any chemical.
+                                        </div>
                                     </div>
                                 </div>
-        
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Never Mix Metals in the Same Solution</h5>
-                                        <p class="card-text">Always clean coins of different metal types separately. Mixing metals in one solution can cause
-                                        undesirable reactions and damage to the coins.</p>
+                                
+                                <div class="accordion-item border-0 shadow-sm">
+                                    <h4 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                            Never Mix Metals in the Same Solution
+                                        </button>
+                                    </h4>
+                                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#cleaningAccordion">
+                                        <div class="accordion-body">
+                                            Always clean coins of different metal types separately. Mixing metals in one solution can cause
+                                            undesirable reactions and damage to the coins.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Call to Action -->
+    <div class="container py-5">
+        <div class="card bg-primary text-white border-0 shadow-lg">
+            <div class="card-body p-5 text-center">
+                <h2 class="display-5 fw-bold mb-3">Ready to Join the CollectoHub Community?</h2>
+                <p class="lead mb-4">Connect with collectors worldwide and start trading your coins today!</p>
+                <a href="{% url 'coins:index' %}" class="btn btn-light btn-lg px-5 shadow">Get Started Now</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Add custom CSS for new components -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #3a47d5 0%, #00d2ff 100%);
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    
+    .process-number {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .hover-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .img-cover {
+        object-fit: cover;
+    }
+    
+    .bg-gradient-overlay {
+        background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.3));
+    }
+    
+    .avatar-group {
+        display: flex;
+    }
+    
+    .avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: -10px;
+        border: 2px solid white;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(58, 71, 213, 0.1);
+        color: #3a47d5;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+    
+    .rounded-lg {
+        border-radius: 0.5rem;
+    }
+    
+    .scrollable-content::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .scrollable-content::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 3px;
+    }
+</style>
 
 {% endblock %}
