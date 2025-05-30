@@ -1,4 +1,7 @@
-{% extends 'coins/base.html' %} {% block title %} {{ country.name }} - Coins {% endblock %} {% block content %}
+{% extends 'coins/base.html' %} 
+{% block title %}{% if country.title and country.title != '' %}{{ country.title }}{% else %}Coin Exchange - {{ country.name }} Coins Catalog for Collectors | CollectoHub {% endif %} {% endblock %} 
+{% block description %}{% if country.description and country.description != '' %}{{ country.description }}{% else %}Coins from {{ country.name }} for exchange ➤ Official catalog with images and details. Exchange collectible coins with other enthusiasts on CollectoHub. {% endif %} {% endblock %}
+{% block content %}
 <h1>Coins of {{ country.name }}</h1>
 
 <div class="row">
@@ -102,4 +105,11 @@
     </div>
 </div>
 
+{% if country.content and country.content != '' %}
+<div class="row">
+    <div class="col-md-12">
+        {{ country.content|safe }}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

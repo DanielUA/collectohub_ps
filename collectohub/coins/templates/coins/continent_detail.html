@@ -1,4 +1,7 @@
-{% extends 'coins/base.html' %} {% block title %} {{ continent.name }} - Coins {% endblock %} {% block content %}
+{% extends 'coins/base.html' %} 
+{% block title %}{% if continent.title and continent.title != '' %}{{ continent.title }}{% else %}Coin Exchange from {{ continent.name }} – Collectible Coins Catalog | CollectoHub {% endif %} {% endblock %} 
+{% block description %}{% if continent.description and continent.description != '' %}{{ continent.description }}{% else %}Explore collectible coins from {{ continent.name }} ➤ View and exchange rare coins with fellow collectors. Easy-to-use catalog for coin exchange. {% endif %} {% endblock %}
+{% block content %}
 <h1>Coins of {{ continent.name }}</h1>
 <div class="row">
     <div class="col-md-3">
@@ -118,5 +121,13 @@
         </div>
     </div>
 </div>
+
+{% if continent.content and continent.content != '' %}
+<div class="row">
+    <div class="col-md-12">
+        {{ continent.content|safe }}
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}
