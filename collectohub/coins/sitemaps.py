@@ -19,7 +19,7 @@ class CoinSitemap(Sitemap):
     priority = 0.9
 
     def items(self):
-        return Coin.objects.filter(status='public')  # або інший фільтр для публічних монет
+        return Coin.objects.filter(status='a')  # або інший фільтр для публічних монет
 
     def location(self, obj):
         return reverse('coins:coin-detail', kwargs={'pk': obj.pk})
