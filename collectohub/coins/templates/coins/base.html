@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="wbNgP6cCTEbODvLwjeSceZWSte5XOuI5aCVkS3ut-Fw" />
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'coins/img/favicon.png' %}">
     <script
     src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -27,7 +28,12 @@
       crossorigin="anonymous"
     ></script>
 
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% if title != '' %}{{title}}{% else %}{% block title %}{% endblock %}{% endif %}</title>
+    {% if description != '' %}
+    <meta name="description" content="{{description}}">
+    {% else %}
+    <meta name="description" content="{% block description %}{% endblock %}">
+    {% endif %}
 
     <link
       rel="stylesheet"
@@ -35,8 +41,14 @@
     />
     {% block style %}{% endblock %}
     <link rel="stylesheet" href="{% static 'coins/cookie-consent.css' %}">
+    {% for script in global_scripts_head %}
+        {{ script.content|safe }}
+    {% endfor %}
 </head>
 <body>
+    {% for script in global_scripts_body_top %}
+        {{ script.content|safe }}
+    {% endfor %}
     <div id="cookie-consent-banner" class="cookie-banner" style="display: none;">
         <div class="cookie-content">
             <p>This website uses cookies to ensure you get the best experience on our website.</p>
@@ -187,5 +199,8 @@
       src="{% static 'coins/base.js' %}"
     ></script>
     <script src="{% static 'coins/cookie-consent.js' %}"></script>
+    {% for script in global_scripts_body_bottom %}
+        {{ script.content|safe }}
+    {% endfor %}
 </body>
 </html>

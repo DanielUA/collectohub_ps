@@ -50,3 +50,14 @@ class MultiOfferAdmin(admin.ModelAdmin):
 @admin.register(UserSurvey)
 class UserSurveyAdmin(admin.ModelAdmin):
     list_display = ['user', 'created']
+
+@admin.register(PageSeo)
+class PageSeoAdmin(admin.ModelAdmin):
+    list_display = ['url', 'title']
+    search_fields = ['url', 'title', 'description']
+
+@admin.register(GlobalScript)
+class GlobalScriptAdmin(admin.ModelAdmin):
+    list_display = ['name', 'position']
+    search_fields = ['name', 'position']
+    

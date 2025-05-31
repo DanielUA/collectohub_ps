@@ -1,8 +1,8 @@
 {% extends 'coins/base.html' %}
 
-{% block title %}
-    {{ coin }}
-{% endblock %}
+
+{% block title %}{% if coin.title and coin.title != '' %}{{ coin.title }}{% else %}{{ coin.denomination|title}} {{ coin.year }} – Exchange, Details, Specs | CollectoHub {% endif %} {% endblock %} 
+{% block description %}{% if coin.description and coin.description != '' %}{{ coin.description }}{% else %}Exchange the “{{ coin.denomination|title}}” issued in {{ coin.year }} ➤ Full details, images, and specifications. Safe collector exchange on CollectoHub. {% endif %} {% endblock %}
 {% block style %}
 <style>
   .modal-content {
@@ -99,6 +99,14 @@
             </div>
             {% endif %}
         </div>
+        {% if coin.content and coin.content != '' %}
+        <div class="row">
+            <div class="col-md-12">
+                {{ coin.content|safe }}
+            </div>
+        </div>
+        {% endif %}
+        
     </div>
     <div class="col-6">
        <div class="card">

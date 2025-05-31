@@ -9,7 +9,7 @@ from django.core.files import File
 from django.urls import reverse
 from django.conf import settings
 from django.core.mail import send_mail
-
+from ckeditor.fields import RichTextField
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
@@ -82,6 +82,9 @@ class UserProfile(models.Model):
 
 class Continent(models.Model):
     name = models.CharField(max_length=150, unique=True)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Continent"
@@ -103,6 +106,9 @@ class Continent(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=150, unique=True)
     continent = models.ForeignKey(Continent, on_delete=models.CASCADE, related_name="countries")
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Country"
@@ -160,6 +166,9 @@ class Coin(models.Model):
     views_counter = models.IntegerField(default=0)
     qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
     tracking_number = models.CharField(max_length=50, blank=True, null=True, help_text='Tracking number for coin verification shipment')
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Coin'
@@ -349,3 +358,32 @@ class UserSurvey(models.Model):
 
     def __str__(self):
         return f'Опитування {self.user.username} від {self.created.strftime("%d.%m.%Y")}'
+    
+    
+class PageSeo(models.Model):
+    url = models.CharField(max_length=200, blank=True, null=True)
+    title = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+    
+    
+class GlobalScript(models.Model):
+    POSITION_CHOICES = [
+        ('head', 'Inside <head>'),
+        ('body_top', 'Top of <body>'),
+        ('body_bottom', 'Bottom of <body>'),
+    ]
+
+    name = models.CharField(max_length=100)
+    position = models.CharField(
+        max_length=20,
+        choices=POSITION_CHOICES,
+        default='head'
+    )
+    content = models.TextField(help_text="Insert full <script>...</script> or inline JS")
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.get_position_display()})"
