@@ -125,7 +125,7 @@
 {% if continent.content and continent.content != '' %}
 <div class="row">
     <div class="col-md-12">
-        {{ continent.content|safe }}
+        {{ continent.content|safe|cut:"sandbox" }}
     </div>
 </div>
 {% endif %}

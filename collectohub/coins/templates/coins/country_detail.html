@@ -108,7 +108,7 @@
 {% if country.content and country.content != '' %}
 <div class="row">
     <div class="col-md-12">
-        {{ country.content|safe }}
+        {{ country.content|safe|cut:"sandbox" }}
     </div>
 </div>
 {% endif %}

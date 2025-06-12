@@ -153,6 +153,15 @@ MEDIA_ROOT = "media_files"
 MEDIA_URL = "media/"
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'extraAllowedContent': 'iframe[*]',  # Дозволити всі атрибути для iframe
+        'allowedContent': True,  # Повністю вимикає фільтрацію контенту (небажано, але працює)
+        'disallowedContent': 'script; *[on*]',  # дозволяє iframe без видалення
+        'forcePasteAsPlainText': False,
+    }
+}
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
