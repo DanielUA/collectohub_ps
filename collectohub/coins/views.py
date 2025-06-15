@@ -40,6 +40,7 @@ class IndexView(ListView):
     template_name = 'coins/all_coins_page.html'
     extra_context = {
         "continent_list": Continent.objects.all().order_by("name"),
+        "coin_categories": CoinCategory.objects.filter(parent__isnull=True).order_by("name"),
     }
     paginate_by = 12
 
@@ -51,7 +52,7 @@ class IndexView(ListView):
         min_year = cookies.get('min_year')
         max_year = cookies.get('max_year')
         denomination = cookies.get('denomination')
-        
+        material = cookies.get('material')
         if min_year != '' and min_year is not None:
             queryset = queryset.filter(year__gte=min_year)
         if max_year != '' and max_year is not None:
@@ -59,6 +60,8 @@ class IndexView(ListView):
         if denomination is not None and denomination != '':
             denomination = denomination.split(',')
             queryset = queryset.filter(denomination__in=denomination)
+        if material is not None and material != '' and material != 'undefined':
+            queryset = queryset.filter(material=material)
         
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(owner=self.request.user)
@@ -810,6 +813,47 @@ class CountryDetailView(DetailView):
         context['coins'] = coins
         
         return context
+    
+    
+class CoinCategoryDetailView(DetailView):
+    model = CoinCategory
+    context_object_name = 'coin_category'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['coin_categories'] = self.object.get_all_subcategories()
+        coins = self.object.get_all_coins()
+        
+        # Додаємо додаткові змінні до контексту
+        context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        
+        if min_year != '' and min_year is not None:
+            coins = coins.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            coins = coins.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            coins = coins.filter(denomination__in=denomination)
+        
+        paginator = Paginator(coins, 12)
+        page = self.request.GET.get("page", 1)
+
+        try:
+            coins = paginator.page(page)
+        except PageNotAnInteger:
+            coins = paginator.page(1)
+        except EmptyPage:
+            coins = paginator.page(paginator.num_pages)
+        context['coins'] = coins
+        return context
 
 
 class CoinsToSendListView(View):
@@ -893,6 +937,7 @@ class CreateCoin(LoginRequiredMixin, View):
     def get(request, *args, **kwargs):
         context = {
             'countries': Country.objects.all().order_by('name'),
+            'coin_categories': CoinCategory.objects.all().order_by('name'),
             'material_choices': material_choices,
             'safety_choices': safety_choices,
         }
@@ -906,6 +951,7 @@ class CreateCoin(LoginRequiredMixin, View):
         context = {
             'errors': {},
             'countries': Country.objects.all().order_by('name'),
+            'coin_categories': CoinCategory.objects.all().order_by('name'),
             'material_choices': material_choices,
             'safety_choices': safety_choices,
         }
@@ -913,6 +959,7 @@ class CreateCoin(LoginRequiredMixin, View):
         try:
             # Get form data
             country_id = request.POST.get('country')
+            coin_category = request.POST.getlist('coin_category')
             denomination = request.POST.get('denomination')
             year = request.POST.get('year')
             material = request.POST.get('material')
@@ -966,6 +1013,8 @@ class CreateCoin(LoginRequiredMixin, View):
                 )
 
                 coin.save()
+                if coin_category:
+                    coin.category.set(CoinCategory.objects.filter(id__in=coin_category))
                 return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
 
         except ValueError as e:
@@ -986,6 +1035,7 @@ class UpdateCoin(LoginRequiredMixin, View):
             context = {
                 'coin': coin,
                 'countries': Country.objects.all().order_by('name'),
+                'coin_categories': CoinCategory.objects.all().order_by('name'),
                 'material_choices': material_choices,
                 'safety_choices': safety_choices,
             }
@@ -1002,6 +1052,7 @@ class UpdateCoin(LoginRequiredMixin, View):
                 'coin': coin,
                 'errors': {},
                 'countries': Country.objects.all().order_by('name'),
+                'coin_categories': CoinCategory.objects.all().order_by('name'),
                 'material_choices': material_choices,
                 'safety_choices': safety_choices,
             }
@@ -1016,6 +1067,7 @@ class UpdateCoin(LoginRequiredMixin, View):
             diameter = request.POST.get('diameter')
             thickness = request.POST.get('thickness')
             circulation = request.POST.get('circulation')
+            coin_category = request.POST.getlist('coin_category')
 
             # Validate required fields
             if not country_id:
@@ -1061,6 +1113,8 @@ class UpdateCoin(LoginRequiredMixin, View):
                         setattr(coin, img_field, request.FILES[img_field])
 
                 coin.save()
+                if coin_category:
+                    coin.category.set(CoinCategory.objects.filter(id__in=coin_category))
                 return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
 
         except Coin.DoesNotExist:

@@ -102,7 +102,7 @@
         {% if coin.content and coin.content != '' %}
         <div class="row">
             <div class="col-md-12">
-                {{ coin.content|safe }}
+                {{ coin.content|safe|cut:"sandbox" }}
             </div>
         </div>
         {% endif %}

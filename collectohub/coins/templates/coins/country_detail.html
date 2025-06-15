@@ -18,6 +18,31 @@
                 <!-- Блок з меню -->
                 <div class="collapse navbar-collapse" id="navbarMenu">
                     <ol class="list-group w-100">
+                        {% if country.coin_categories.all|length > 0 %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">All categories in {{ country.name }}:</div>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% for category in country.coin_categories.all %}
+                        <a href="{% url 'coins:coin-category-detail' category.id %}" class="text text-decoration-none">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-normal">- {{ category.name }}</div>
+                                </div>
+                            </li>
+                        </a>
+                        {% endfor %}
+                        <li class="list-group-item">
+                            <label class="fw-bold">Material:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" name="material" type="checkbox" {% if material == 'ag' %}checked{% endif %} value="ag" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                  Silver
+                                </label>
+                              </div>
+                        </li>
                         <li class="list-group-item">
                             <label>Change years:</label>
                             <div class="d-flex gap-3">
@@ -108,7 +133,7 @@
 {% if country.content and country.content != '' %}
 <div class="row">
     <div class="col-md-12">
-        {{ country.content|safe }}
+        {{ country.content|safe|cut:"sandbox" }}
     </div>
 </div>
 {% endif %}

@@ -121,6 +121,40 @@ class Country(models.Model):
         return self.name
 
 
+class CoinCategory(models.Model):
+    name = models.CharField(max_length=150)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
+    countries = models.ManyToManyField(Country, blank=True, related_name='coin_categories')
+    continents = models.ManyToManyField(Continent, blank=True, related_name='coin_categories')
+
+    class Meta:
+        verbose_name = "Категорія монет"
+        verbose_name_plural = "Категорії монет"
+        ordering = ['name']
+
+    def get_all_subcategories(self):
+        """Отримати всі підкатегорії рекурсивно"""
+        subcategories = list(self.subcategories.all())
+        for subcategory in self.subcategories.all():
+            subcategories.extend(subcategory.get_all_subcategories())
+        return subcategories
+
+    def get_all_coins(self):
+        """Отримати всі монети в цій категорії та підкатегоріях"""
+        subcategories = self.get_all_subcategories()
+        return Coin.objects.filter(
+            (Q(category=self) | Q(category__in=subcategories)) & Q(status='a')
+        ).distinct()
+
+    def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} > {self.name}"
+        return self.name
+
+
 safety_choices = [('v', 'v'), ('vf', 'vf'), ('f', 'f'), ('xf', 'xf')]
 material_choices = [
     ("gold", "au"),
@@ -151,6 +185,7 @@ class Coin(models.Model):
     img_add_1 = models.ImageField(upload_to='products_image', blank=True)
     img_add_2 = models.ImageField(upload_to='products_image', blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='coins')  # Reference to Country
+    category = models.ManyToManyField(CoinCategory, blank=True, related_name='coins')
     denomination = models.CharField(max_length=150)  # Denomination
     year = models.IntegerField()  # Year
     material = models.CharField(max_length=15, blank=True, choices=material_choices)  # Material
