@@ -60,10 +60,8 @@ class IndexView(ListView):
         if denomination is not None and denomination != '':
             denomination = denomination.split(',')
             queryset = queryset.filter(denomination__in=denomination)
-        print(queryset.count())
-        if material is not None and material != '':
+        if material is not None and material != '' and material != 'undefined':
             queryset = queryset.filter(material=material)
-        print(queryset.count())
         
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(owner=self.request.user)
@@ -939,6 +937,7 @@ class CreateCoin(LoginRequiredMixin, View):
     def get(request, *args, **kwargs):
         context = {
             'countries': Country.objects.all().order_by('name'),
+            'coin_categories': CoinCategory.objects.all().order_by('name'),
             'material_choices': material_choices,
             'safety_choices': safety_choices,
         }
@@ -952,6 +951,7 @@ class CreateCoin(LoginRequiredMixin, View):
         context = {
             'errors': {},
             'countries': Country.objects.all().order_by('name'),
+            'coin_categories': CoinCategory.objects.all().order_by('name'),
             'material_choices': material_choices,
             'safety_choices': safety_choices,
         }
@@ -959,6 +959,7 @@ class CreateCoin(LoginRequiredMixin, View):
         try:
             # Get form data
             country_id = request.POST.get('country')
+            coin_category = request.POST.getlist('coin_category')
             denomination = request.POST.get('denomination')
             year = request.POST.get('year')
             material = request.POST.get('material')
@@ -1012,6 +1013,8 @@ class CreateCoin(LoginRequiredMixin, View):
                 )
 
                 coin.save()
+                if coin_category:
+                    coin.category.set(CoinCategory.objects.filter(id__in=coin_category))
                 return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
 
         except ValueError as e:
@@ -1032,6 +1035,7 @@ class UpdateCoin(LoginRequiredMixin, View):
             context = {
                 'coin': coin,
                 'countries': Country.objects.all().order_by('name'),
+                'coin_categories': CoinCategory.objects.all().order_by('name'),
                 'material_choices': material_choices,
                 'safety_choices': safety_choices,
             }
@@ -1048,6 +1052,7 @@ class UpdateCoin(LoginRequiredMixin, View):
                 'coin': coin,
                 'errors': {},
                 'countries': Country.objects.all().order_by('name'),
+                'coin_categories': CoinCategory.objects.all().order_by('name'),
                 'material_choices': material_choices,
                 'safety_choices': safety_choices,
             }
@@ -1062,6 +1067,7 @@ class UpdateCoin(LoginRequiredMixin, View):
             diameter = request.POST.get('diameter')
             thickness = request.POST.get('thickness')
             circulation = request.POST.get('circulation')
+            coin_category = request.POST.getlist('coin_category')
 
             # Validate required fields
             if not country_id:
@@ -1107,6 +1113,8 @@ class UpdateCoin(LoginRequiredMixin, View):
                         setattr(coin, img_field, request.FILES[img_field])
 
                 coin.save()
+                if coin_category:
+                    coin.category.set(CoinCategory.objects.filter(id__in=coin_category))
                 return HttpResponseRedirect(reverse('coins:user-cabinet-coins'))
 
         except Coin.DoesNotExist:

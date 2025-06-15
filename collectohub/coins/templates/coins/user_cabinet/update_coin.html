@@ -161,6 +161,32 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Categories</label>
+                                <div class="category-checkboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem;">
+                                    <div class="row">
+                                        {% for category in coin_categories %}
+                                            <div class="col-md-4 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" 
+                                                           type="checkbox" 
+                                                           name="coin_category" 
+                                                           value="{{ category.id }}" 
+                                                           {% if category in coin.category.all %}checked{% endif %}
+                                                           id="category_{{ category.id }}">
+                                                    <label class="form-check-label" for="category_{{ category.id }}">
+                                                        {{ category.name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-text">Select one or more categories for your coin</div>
+                            </div>
+                        </div>
+
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary">Update Coin</button>
                         </div>
