@@ -26,10 +26,12 @@ class CoinAdmin(admin.ModelAdmin):
         ]
     list_filter = [
         'status',
+        'material',
     ]
     search_fields = [
         'denomination',
     ]
+    filter_horizontal = ['category']
 
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
@@ -60,4 +62,11 @@ class PageSeoAdmin(admin.ModelAdmin):
 class GlobalScriptAdmin(admin.ModelAdmin):
     list_display = ['name', 'position']
     search_fields = ['name', 'position']
+    
+@admin.register(CoinCategory)
+class CoinCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'parent']
+    search_fields = ['name', 'parent', 'countries', 'continents']
+    list_filter = ['parent', 'countries', 'continents']
+    filter_horizontal = ['countries', 'continents']
     

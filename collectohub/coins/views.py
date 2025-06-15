@@ -40,6 +40,7 @@ class IndexView(ListView):
     template_name = 'coins/all_coins_page.html'
     extra_context = {
         "continent_list": Continent.objects.all().order_by("name"),
+        "coin_categories": CoinCategory.objects.filter(parent__isnull=True).order_by("name"),
     }
     paginate_by = 12
 
@@ -51,7 +52,7 @@ class IndexView(ListView):
         min_year = cookies.get('min_year')
         max_year = cookies.get('max_year')
         denomination = cookies.get('denomination')
-        
+        material = cookies.get('material')
         if min_year != '' and min_year is not None:
             queryset = queryset.filter(year__gte=min_year)
         if max_year != '' and max_year is not None:
@@ -59,6 +60,10 @@ class IndexView(ListView):
         if denomination is not None and denomination != '':
             denomination = denomination.split(',')
             queryset = queryset.filter(denomination__in=denomination)
+        print(queryset.count())
+        if material is not None and material != '':
+            queryset = queryset.filter(material=material)
+        print(queryset.count())
         
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(owner=self.request.user)
@@ -809,6 +814,47 @@ class CountryDetailView(DetailView):
             coins = paginator.page(paginator.num_pages)
         context['coins'] = coins
         
+        return context
+    
+    
+class CoinCategoryDetailView(DetailView):
+    model = CoinCategory
+    context_object_name = 'coin_category'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['coin_categories'] = self.object.get_all_subcategories()
+        coins = self.object.get_all_coins()
+        
+        # Додаємо додаткові змінні до контексту
+        context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        
+        if min_year != '' and min_year is not None:
+            coins = coins.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            coins = coins.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            coins = coins.filter(denomination__in=denomination)
+        
+        paginator = Paginator(coins, 12)
+        page = self.request.GET.get("page", 1)
+
+        try:
+            coins = paginator.page(page)
+        except PageNotAnInteger:
+            coins = paginator.page(1)
+        except EmptyPage:
+            coins = paginator.page(paginator.num_pages)
+        context['coins'] = coins
         return context
 
 

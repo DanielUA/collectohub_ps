@@ -11,6 +11,7 @@ jQuery("document").ready(function ($) {
     function saveFiltersToCookies() {
         const startYear = $('input[name="min_year"]').val();
         const endYear = $('input[name="max_year"]').val();
+        const material = $('input[name="material"]:checked').val();
         const denomination = [];
         $('input[name="denomination"]:checked').each(function() {
             denomination.push($(this).val());
@@ -20,6 +21,7 @@ jQuery("document").ready(function ($) {
         document.cookie = `min_year=${startYear}; path=/`;
         document.cookie = `max_year=${endYear}; path=/`;
         document.cookie = `denomination=${denomination.join(',')}; path=/`;
+        document.cookie = `material=${material}; path=/`;
     }
 
     // Функція для завантаження фільтрів з кукі
@@ -41,6 +43,13 @@ jQuery("document").ready(function ($) {
             const denomination = cookies.denomination.split(',');
             $('input[name="denomination"]').each(function() {
                 if (denomination.includes($(this).val())) {
+                    $(this).prop('checked', true);
+                }
+            });
+        }
+        if (cookies.material) {
+            $('input[name="material"]').each(function() {
+                if (cookies.material.includes($(this).val())) {
                     $(this).prop('checked', true);
                 }
             });

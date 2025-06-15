@@ -36,6 +36,8 @@ urlpatterns = [
     path('user/cabinet/offers-for-me/', views.UserCabinetOffersForMeView.as_view(), name='user-cabinet-offers-for-me'),
     path('user/cabinet/offers-history/', views.UserCabinetOffersHistoryView.as_view(), name='user-cabinet-offers-history'),
     path('coin/change/status/', views.coin_change_status, name='coin-change-status'),
+    # Coin categories
+    path('category/<int:pk>/', views.CoinCategoryDetailView.as_view(), name='coin-category-detail'),
     path('continent/<int:pk>/', views.ContinentDetailView.as_view(), name='continent-detail'),
     path('country/<int:pk>/', views.CountryDetailView.as_view(), name='country-detail'),
     path('coins/send/', views.CoinsToSendListView.as_view(), name='coins-to-send'),
