@@ -66,4 +66,5 @@ urlpatterns = [
     # path('cart/update/', views.update_cart, name='update_cart'),
     # path('checkout/', views.checkout_view, name='checkout'),  # You'll need to implement the checkout_view
     path('user-survey/', views.UserSurveyView.as_view(), name='user-survey'),
+    path('hall-of-fame/', views.HallOfFameView.as_view(), name='hall-of-fame'),
 ]

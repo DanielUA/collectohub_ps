@@ -1376,3 +1376,29 @@ class UserSurveyView(View):
         user_survey.interested_countries.set(Country.objects.filter(id__in=form_data['interested_countries']))
         
         return HttpResponseRedirect(reverse('coins:user-survey'))
+    
+    
+class HallOfFameView(View):
+    @staticmethod
+    def get(request, *args, **kwargs):
+        from .models import Badge
+        
+        # Отримуємо всіх користувачів, які мають значки
+        users = User.objects.filter(profile__badges__isnull=False).distinct().prefetch_related('profile__badges')
+        
+        # Пагінація
+        paginator = Paginator(users, 12)
+        page_number = request.GET.get('page', 1)
+
+        try:
+            users = paginator.page(page_number)
+        except PageNotAnInteger:
+            users = paginator.page(1)
+        except EmptyPage:
+            users = paginator.page(paginator.num_pages)
+            
+        context = {
+            'users': users,
+            'badges': Badge.objects.filter(is_active=True).order_by('order'),
+        }
+        return render(request, 'coins/hall_of_fame.html', context)

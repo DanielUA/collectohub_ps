@@ -4,6 +4,8 @@ from .models import *
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'user_pic']
+    filter_horizontal = ['badges']
+    list_filter = ['badges']
 
 @admin.register(Continent)
 class ContinentsAdmin(admin.ModelAdmin):
@@ -69,4 +71,12 @@ class CoinCategoryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'parent', 'countries', 'continents']
     list_filter = ['parent', 'countries', 'continents']
     filter_horizontal = ['countries', 'continents']
+    
+@admin.register(Badge)
+class BadgeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'order', 'is_active', 'created']
+    list_filter = ['is_active', 'created']
+    search_fields = ['name', 'description']
+    readonly_fields = ['created']
+    list_editable = ['order', 'is_active']
     
