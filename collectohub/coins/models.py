@@ -11,6 +11,24 @@ from django.conf import settings
 from django.core.mail import send_mail
 from ckeditor.fields import RichTextField
 
+class Badge(models.Model):
+    """Модель для значків (досягнень) користувачів"""
+    name = models.CharField(max_length=100, verbose_name='Назва значка')
+    description = models.TextField(verbose_name='Опис значка')
+    icon = models.ImageField(upload_to='badges/', verbose_name='Іконка значка')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок відображення')
+    created = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True, verbose_name='Активний')
+    legendary = models.BooleanField(default=False, verbose_name='Легендарний')
+
+    class Meta:
+        verbose_name = 'Значок'
+        verbose_name_plural = 'Значки'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.name
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     user_pic = models.ImageField(blank=True, upload_to='coins/user_pic/')
@@ -18,6 +36,7 @@ class UserProfile(models.Model):
     postcode = models.CharField(max_length=10, blank=True)
     addres = models.CharField(max_length=150, blank=True)
     city = models.CharField(max_length=20, blank=True)
+    badges = models.ManyToManyField(Badge, blank=True, related_name='users', verbose_name='Значки')
 
     # New Fields
     # coin_holders = models.PositiveIntegerField(default=0)
@@ -62,6 +81,27 @@ class UserProfile(models.Model):
 
     def unread_messages_count(self):
         return self.user.received_messages.filter(is_read=False).count()
+
+    def earned_badges(self):
+        """Повертає всі зароблені значки користувача"""
+        return self.badges.filter(is_active=True)
+
+    def add_badge(self, badge):
+        """Додає значок користувачу"""
+        if badge.is_active:
+            self.badges.add(badge)
+
+    def remove_badge(self, badge):
+        """Видаляє значок у користувача"""
+        self.badges.remove(badge)
+
+    def has_badge(self, badge):
+        """Перевіряє чи має користувач певний значок"""
+        return self.badges.filter(id=badge.id, is_active=True).exists()
+    
+    def has_legendary_badge(self):
+        """Перевіряє чи має користувач легендарні значки"""
+        return self.badges.filter(legendary=True, is_active=True).exists()
 
     # New Methods
     # def total_coins_sent(self):

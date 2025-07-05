@@ -97,6 +97,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'coins:about-me' %}">About me</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'coins:hall-of-fame' %}">
+                            <i class="fas fa-trophy text-warning"></i> Hall of Fame
+                        </a>
+                    </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'coins:user-cabinet' %}">Personal Cabinet</a>
