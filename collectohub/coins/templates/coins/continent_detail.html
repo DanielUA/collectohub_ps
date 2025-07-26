@@ -18,35 +18,35 @@
                 <div class="collapse navbar-collapse" id="navbarMenu">
                     <ol class="list-group w-100">
                         {% if continent.coin_categories.all|length > 0 %}
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold">All categories in {{ continent.name }}:</div>
+                        <li class="list-group-item">
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop2" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Categories
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop2" style="max-height: 200px; overflow-y: auto;">
+                                    {% for category in continent.coin_categories.all %}
+                                    <li class="dropdown-item">
+                                        <a href="{% url 'coins:coin-category-detail' category.id %}" class="text text-decoration-none">
+                                            {{ category.name }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </li>
                         {% endif %}
-                        {% for category in continent.coin_categories.all %}
-                        <a href="{% url 'coins:coin-category-detail' category.id %}" class="text text-decoration-none">
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div class="fw-normal">- {{ category.name }}</div>
-                                </div>
-                            </li>
-                        </a>
-                        {% endfor %}
                         <li class="list-group-item">
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 Change country
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="max-height: 200px; overflow-y: auto;">
                                     {% for country in continent.get_coutries_has_coins %}
-                                    <a href="{% url 'coins:country-detail' pk=country.id%}" class="text text-decoration-none">
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div class="ms-2 me-auto">
-                                                <div class="fw-bold">{{ country }}</div>
-                                            </div>
-                                        </li>
-                                    </a>
+                                    <li class="dropdown-item">
+                                        <a href="{% url 'coins:country-detail' pk=country.id%}" class="text text-decoration-none">
+                                            {{ country }}
+                                        </a>
+                                    </li>
                                     {% endfor %}
                                 </ul>
                             </div>
@@ -72,7 +72,7 @@
                                 <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 Change denomination
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="max-height: 200px; overflow-y: auto;">
                                     {% for i in list_denomination %}
                                     <li class="dropdown-item">
                                         <div class="form-check">
