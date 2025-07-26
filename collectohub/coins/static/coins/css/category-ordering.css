@@ -63,9 +63,10 @@
 /* Індикатор можливості drag */
 #result_list tbody tr td:first-child:before {
     content: "⋮⋮";
+    position: absolute;
     color: #6c757d;
     font-size: 12px;
-    margin-right: 8px;
+    margin-left: -22px;
     opacity: 0;
     transition: opacity 0.2s ease;
 }
