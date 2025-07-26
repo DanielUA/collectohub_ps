@@ -89,6 +89,17 @@ class CoinCategoryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'parent__name', 'countries__name', 'continents__name']
     list_filter = ['parent', 'countries', 'continents']
     filter_horizontal = ['countries', 'continents']
+    ordering = ['ordering']
+    
+    class Media:
+        css = {
+            'all': (
+                'coins/css/category-ordering.css',
+            )
+        }
+        js = (
+            'coins/js/category-ordering.js',
+        )
     
     def get_urls(self):
         urls = super().get_urls()
@@ -96,6 +107,9 @@ class CoinCategoryAdmin(admin.ModelAdmin):
             path('get_filtered_categories_ajax/', 
                  self.admin_site.admin_view(self.get_filtered_categories_ajax), 
                  name='get_filtered_categories_ajax'),
+            path('update_ordering/', 
+                 self.admin_site.admin_view(self.update_ordering), 
+                 name='update_ordering'),
         ]
         return custom_urls + urls
     
@@ -122,6 +136,40 @@ class CoinCategoryAdmin(admin.ModelAdmin):
         
         return JsonResponse({'categories': categories})
     
+    @method_decorator(csrf_exempt)
+    def update_ordering(self, request):
+        """AJAX endpoint для оновлення порядку категорій"""
+        if request.method == 'POST':
+            try:
+                import json
+                data = request.POST
+                updates_json = data.get('updates')
+                
+                if updates_json:
+                    updates = json.loads(updates_json)
+                    
+                    for update in updates:
+                        category_id = update.get('category_id')
+                        new_ordering = update.get('ordering')
+                        
+                        if category_id and new_ordering is not None:
+                            try:
+                                category = CoinCategory.objects.get(id=category_id)
+                                category.ordering = int(new_ordering)
+                                category.save()
+                            except CoinCategory.DoesNotExist:
+                                continue
+                    
+                    return JsonResponse({'success': True})
+                else:
+                    return JsonResponse({'success': False, 'error': 'Missing updates data'})
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)})
+        
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
     def get_countries(self, obj):
         return ", ".join([country.name for country in obj.countries.all()[:3]])
     get_countries.short_description = 'Країни'
@@ -129,6 +177,8 @@ class CoinCategoryAdmin(admin.ModelAdmin):
     def get_continents(self, obj):
         return ", ".join([continent.name for continent in obj.continents.all()[:3]])
     get_continents.short_description = 'Континенти'
+    
+
     
 @admin.register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
