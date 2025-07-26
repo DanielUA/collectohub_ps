@@ -1,5 +1,12 @@
 from django.contrib import admin
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.urls import path
 from .models import *
+from .widgets import CategoryFilteredSelectMultiple
+
+
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -25,15 +32,26 @@ class CoinAdmin(admin.ModelAdmin):
         'owner',
         'status',
         'tracking_number',
-        ]
+    ]
     list_filter = [
         'status',
         'material',
     ]
     search_fields = [
         'denomination',
+        'category__name',
+        'country__name',
     ]
     filter_horizontal = ['category']
+    
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """Використовуємо кастомний віджет для поля category"""
+        if db_field.name == 'category':
+            kwargs['widget'] = CategoryFilteredSelectMultiple(
+                verbose_name="Категорії",
+                is_stacked=False
+            )
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
@@ -67,10 +85,50 @@ class GlobalScriptAdmin(admin.ModelAdmin):
     
 @admin.register(CoinCategory)
 class CoinCategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent']
-    search_fields = ['name', 'parent', 'countries', 'continents']
+    list_display = ['name', 'parent', 'get_countries', 'get_continents']
+    search_fields = ['name', 'parent__name', 'countries__name', 'continents__name']
     list_filter = ['parent', 'countries', 'continents']
     filter_horizontal = ['countries', 'continents']
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('get_filtered_categories_ajax/', 
+                 self.admin_site.admin_view(self.get_filtered_categories_ajax), 
+                 name='get_filtered_categories_ajax'),
+        ]
+        return custom_urls + urls
+    
+    @method_decorator(csrf_exempt)
+    def get_filtered_categories_ajax(self, request):
+        """AJAX endpoint для отримання відфільтрованих категорій"""
+        country_id = request.GET.get('country_id')
+        continent_id = request.GET.get('continent_id')
+        
+        queryset = CoinCategory.objects.all()
+        
+        if country_id:
+            queryset = queryset.filter(countries__id=country_id)
+        
+        if continent_id:
+            queryset = queryset.filter(continents__id=continent_id)
+        
+        categories = []
+        for category in queryset.distinct():
+            categories.append({
+                'id': category.id,
+                'name': str(category)
+            })
+        
+        return JsonResponse({'categories': categories})
+    
+    def get_countries(self, obj):
+        return ", ".join([country.name for country in obj.countries.all()[:3]])
+    get_countries.short_description = 'Країни'
+    
+    def get_continents(self, obj):
+        return ", ".join([continent.name for continent in obj.continents.all()[:3]])
+    get_continents.short_description = 'Континенти'
     
 @admin.register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
