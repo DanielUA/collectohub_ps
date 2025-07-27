@@ -153,6 +153,7 @@ class Country(models.Model):
     class Meta:
         verbose_name = "Country"
         verbose_name_plural = "Countries"
+        ordering = ['name']
 
     def get_active_coins(self):
         return Coin.objects.filter(country=self, status="a")
@@ -169,11 +170,12 @@ class CoinCategory(models.Model):
     content = RichTextField(blank=True, null=True)
     countries = models.ManyToManyField(Country, blank=True, related_name='coin_categories')
     continents = models.ManyToManyField(Continent, blank=True, related_name='coin_categories')
+    ordering = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Категорія монет"
         verbose_name_plural = "Категорії монет"
-        ordering = ['name']
+        ordering = ['ordering']
 
     def get_all_subcategories(self):
         """Отримати всі підкатегорії рекурсивно"""

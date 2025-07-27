@@ -1,0 +1,118 @@
+/* Стилі для drag and drop функціональності категорій */
+
+/* Додаткові стилі для кращого відображення */
+.draggable-row {
+    transition: all 0.2s ease;
+}
+
+.draggable-row:hover {
+    background-color: #f8f9fa;
+}
+
+/* Стилі для повідомлень */
+.ordering-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 300px;
+    padding: 10px 15px !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+}
+
+.ordering-message.messagelist {
+    background-color: #d4edda !important;
+    border: 1px solid #c3e6cb !important;
+    color: #155724 !important;
+}
+
+.ordering-message.info {
+    background-color: #d1ecf1 !important;
+    border: 1px solid #bee5eb !important;
+    color: #062c33 !important;
+}
+
+.ordering-message.errornote {
+    background-color: #f8d7da !important;
+    border: 1px solid #f5c6cb !important;
+    color: #721c24 !important;
+}
+
+/* Анімація для drag */
+@keyframes dragPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.dragging .field-ordering {
+    animation: dragPulse 0.5s ease-in-out infinite;
+}
+
+/* Стилі для таблиці з drag and drop */
+#result_list tbody tr {
+    transition: all 0.2s ease;
+}
+
+#result_list tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Індикатор можливості drag */
+#result_list tbody tr td:first-child:before {
+    content: "⋮⋮";
+    position: absolute;
+    color: #6c757d;
+    font-size: 12px;
+    margin-left: -22px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#result_list tbody tr td:first-child:hover:before {
+    opacity: 1;
+}
+
+
+
+/* Стилі для повідомлень */
+.ordering-message {
+    margin: 10px auto !important;
+    padding: 10px 15px !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+}
+
+.ordering-message.messagelist {
+    background-color: #d4edda !important;
+    border: 1px solid #c3e6cb !important;
+    color: #155724 !important;
+}
+
+.ordering-message.errornote {
+    background-color: #f8d7da !important;
+    border: 1px solid #f5c6cb !important;
+    color: #721c24 !important;
+}
+
+/* Анімація для drag */
+@keyframes dragPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.dragging .field-ordering {
+    animation: dragPulse 0.5s ease-in-out infinite;
+}
+
+/* Стилі для таблиці з drag and drop */
+#result_list tbody tr {
+    transition: all 0.2s ease;
+}
+
+#result_list tbody tr:hover {
+    background-color: #f8f9fa;
+}

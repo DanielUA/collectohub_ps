@@ -40,7 +40,7 @@ class IndexView(ListView):
     template_name = 'coins/all_coins_page.html'
     extra_context = {
         "continent_list": Continent.objects.all().order_by("name"),
-        "coin_categories": CoinCategory.objects.filter(parent__isnull=True).order_by("name"),
+        "coin_categories": CoinCategory.objects.filter(parent=None, countries=None, continents=None),
     }
     paginate_by = 12
 
