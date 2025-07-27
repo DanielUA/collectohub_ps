@@ -153,6 +153,7 @@ class Country(models.Model):
     class Meta:
         verbose_name = "Country"
         verbose_name_plural = "Countries"
+        ordering = ['name']
 
     def get_active_coins(self):
         return Coin.objects.filter(country=self, status="a")
