@@ -268,8 +268,8 @@ class Coin(models.Model):
             try:
                 old_coin = Coin.objects.get(pk=self.pk)
                 # Delete QR code if field is cleared
-                if old_coin.qr_code and not self.qr_code:
-                    old_coin.qr_code.delete(save=False)
+                # if old_coin.qr_code and not self.qr_code:
+                #     old_coin.qr_code.delete(save=False)
             except Coin.DoesNotExist:
                 pass
 
