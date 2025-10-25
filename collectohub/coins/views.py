@@ -53,6 +53,7 @@ class IndexView(ListView):
         max_year = cookies.get('max_year')
         denomination = cookies.get('denomination')
         material = cookies.get('material')
+        sort = cookies.get('sort')
         if min_year != '' and min_year is not None:
             queryset = queryset.filter(year__gte=min_year)
         if max_year != '' and max_year is not None:
@@ -62,7 +63,8 @@ class IndexView(ListView):
             queryset = queryset.filter(denomination__in=denomination)
         if material is not None and material != '' and material != 'undefined':
             queryset = queryset.filter(material=material)
-        
+        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+            queryset = queryset.order_by(sort)
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(owner=self.request.user)
 
@@ -749,6 +751,7 @@ class ContinentDetailView(DetailView):
         min_year = cookies.get('min_year')
         max_year = cookies.get('max_year')
         denomination = cookies.get('denomination')
+        sort = cookies.get('sort')
         
         if min_year != '' and min_year is not None:
             coins = coins.filter(year__gte=min_year)
@@ -757,6 +760,9 @@ class ContinentDetailView(DetailView):
         if denomination is not None and denomination != '':
             denomination = denomination.split(',')
             coins = coins.filter(denomination__in=denomination)
+            
+        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+            coins = coins.order_by(sort)
             
         paginator = Paginator(coins, 12)
         page = self.request.GET.get("page", 1)
@@ -792,6 +798,7 @@ class CountryDetailView(DetailView):
         min_year = cookies.get('min_year')
         max_year = cookies.get('max_year')
         denomination = cookies.get('denomination')
+        sort = cookies.get('sort')
         
         if min_year != '' and min_year is not None:
             coins = coins.filter(year__gte=min_year)
@@ -800,6 +807,9 @@ class CountryDetailView(DetailView):
         if denomination is not None and denomination != '':
             denomination = denomination.split(',')
             coins = coins.filter(denomination__in=denomination)
+        
+        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+            coins = coins.order_by(sort)
             
         paginator = Paginator(coins, 12)
         page = self.request.GET.get("page", 1)
@@ -834,6 +844,7 @@ class CoinCategoryDetailView(DetailView):
         min_year = cookies.get('min_year')
         max_year = cookies.get('max_year')
         denomination = cookies.get('denomination')
+        sort = cookies.get('sort')
         
         if min_year != '' and min_year is not None:
             coins = coins.filter(year__gte=min_year)
@@ -843,6 +854,9 @@ class CoinCategoryDetailView(DetailView):
             denomination = denomination.split(',')
             coins = coins.filter(denomination__in=denomination)
         
+        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+            coins = coins.order_by(sort)
+            
         paginator = Paginator(coins, 12)
         page = self.request.GET.get("page", 1)
 
