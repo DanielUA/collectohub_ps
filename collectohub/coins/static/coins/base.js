@@ -9,6 +9,7 @@ jQuery("document").ready(function ($) {
 
     // Функція для збереження фільтрів у кукі
     function saveFiltersToCookies() {
+        const sort = $('select[name="sort"]').val();
         const startYear = $('input[name="min_year"]').val();
         const endYear = $('input[name="max_year"]').val();
         const material = $('input[name="material"]:checked').val();
@@ -22,6 +23,7 @@ jQuery("document").ready(function ($) {
         document.cookie = `max_year=${endYear}; path=/`;
         document.cookie = `denomination=${denomination.join(',')}; path=/`;
         document.cookie = `material=${material}; path=/`;
+        document.cookie = `sort=${sort}; path=/`;
     }
 
     // Функція для завантаження фільтрів з кукі
@@ -54,12 +56,19 @@ jQuery("document").ready(function ($) {
                 }
             });
         }
+        if (cookies.sort) {
+            $('select[name="sort"]').val(cookies.sort);
+        }
     }
 
     // Подія для кнопки "Confirm filters"
     $('.confirm_filters').on('click', function(e) {
-        console.log('filt')
         e.preventDefault(); // Забороняємо стандартну поведінку форми
+        saveFiltersToCookies(); // Зберігаємо фільтри у кукі
+        window.location.reload(); // Перезавантажуємо сторінку
+    });
+    
+    $('select[name="sort"]').on('change', function() {
         saveFiltersToCookies(); // Зберігаємо фільтри у кукі
         window.location.reload(); // Перезавантажуємо сторінку
     });
