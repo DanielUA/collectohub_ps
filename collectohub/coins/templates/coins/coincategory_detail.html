@@ -35,13 +35,7 @@
                         </li>
                         {% endif %}
                         <li class="list-group-item">
-                            <label class="fw-bold">Material:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" name="material" type="checkbox" {% if material == 'ag' %}checked{% endif %} value="ag" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                  Silver
-                                </label>
-                              </div>
+                            {% include 'coins/elements/material_filter.html' %}
                         </li>
                         <li class="list-group-item">
                             <label>Change years:</label>
