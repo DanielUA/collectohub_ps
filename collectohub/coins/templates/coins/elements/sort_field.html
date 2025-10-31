@@ -1,0 +1,25 @@
+<div class="row mb-3">
+    <div class="col-12 col-md-3">
+        <select name="sort" class="form-select d-none">
+            <option value="--">--</option>
+            <option value="year">Year up</option>
+            <option value="-year">Year down</option>
+        </select>
+        <div class="btn-group" role="group">
+            <button id="sortBy" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            Sort by...
+            </button>
+            <ul id="sortByList" class="dropdown-menu" aria-labelledby="sortBy" style="max-height: 200px; overflow-y: auto;">
+                <li class="dropdown-item" data-sort="--">
+                    --
+                </li>
+                <li class="dropdown-item" data-sort="year">
+                    Year <i class="bi bi-arrow-up"></i>
+                </li>
+                <li class="dropdown-item" data-sort="-year">
+                    Year <i class="bi bi-arrow-down"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
