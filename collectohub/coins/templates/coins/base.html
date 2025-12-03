@@ -83,6 +83,9 @@
                         <option value="2">
                             denomination
                         </option>
+                        <option value="3">
+                            name
+                        </option>
                     </select>
                         </div>
                         <div class="col-9">
@@ -207,5 +210,6 @@
     {% for script in global_scripts_body_bottom %}
         {{ script.content|safe }}
     {% endfor %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

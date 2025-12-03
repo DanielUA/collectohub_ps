@@ -21,6 +21,14 @@ class ContinentsAdmin(admin.ModelAdmin):
 @admin.register(Country)
 class CountriesAdmin(admin.ModelAdmin):
     list_display = ['name']
+    
+@admin.register(Topic)
+class TopicsAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    
+@admin.register(TypeObject)
+class TypeObjectsAdmin(admin.ModelAdmin):
+    list_display = ['name']
 
 @admin.register(Coin)
 class CoinAdmin(admin.ModelAdmin):

@@ -24,6 +24,13 @@
             </span>
             {% endif %}
         </div>
-        <span class="d-block">{{ coin.denomination|title }} {{ coin.year }}</span>        
+        <span class="d-block">
+            {% if coin.name %}
+            {{ coin.name }}
+            {% else %}
+            {{ coin.denomination|title }}
+            {% endif %}
+             {{ coin.year }}
+        </span>        
     </div>
 </div> 

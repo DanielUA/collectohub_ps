@@ -8,7 +8,14 @@
             {% endif %}
         </a>
         <div class="card-body p-2">
-            <h6 class="card-title">{{ coin.denomination|title }} {{ coin.year }}</h6>
+            <h6 class="card-title">
+                {% if coin.name %}
+                {{ coin.name }}
+                {% else %}
+                {{ coin.denomination|title }}
+                {% endif %}
+                 {{ coin.year }}
+            </h6>
             <div class="d-flex align-items-center gap-2">
                 {% if coin.box %}
                 <span class="text-success d-flex align-items-center" title="Підтверджена">
@@ -22,10 +29,18 @@
                 </span>
                 {% endif %}
             </div>
+            {% if coin.country %}
             <div>{{ coin.country }}</div>
+            {% endif %}
+            {% if coin.material %}
             <div>Material: {{ coin.material }}</div>
+            {% endif %}
+            {% if coin.diameter %}
             <div>Diameter: {{ coin.diameter }}</div>
+            {% endif %}
+            {% if coin.circulation %}
             <div>Circulation: {{ coin.circulation }}</div>
+            {% endif %}
         </div>
     </div>
 </div> 

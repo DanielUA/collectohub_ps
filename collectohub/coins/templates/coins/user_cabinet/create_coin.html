@@ -21,15 +21,52 @@
                         
                         <div class="row mb-3">
                             <div class="col-md-6">
+                                <label for="type_object" class="form-label">Type Object*</label>
+                                <select class="form-select" id="type_object" name="type_object">
+                                    <option value="null">Select type object</option>
+                                    {% for type_object in type_objects %}
+                                        <option value="{{ type_object.id }}">{{ type_object.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 country-input">
+                            <div class="col-md-6 name-input">
+                                <label for="name" class="form-label">Name*</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="name" 
+                                       name="name" 
+                                    >
+                            </div>
+                            <div class="col-md-6">
                                 <label for="country" class="form-label">Country*</label>
-                                <select class="form-select" id="country" name="country" required>
+                                <select class="form-select" id="country" name="country">
                                     <option value="">Select country</option>
                                     {% for country in countries %}
                                         <option value="{{ country.id }}">{{ country.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 topic-input">
+                                <label for="topic" class="form-label">Topic*</label>
+                                <select class="form-select" id="topic" name="topic">
+                                    <option value="">Select topic</option>
+                                    {% for topic in topics %}
+                                        <option value="{{ topic.id }}">{{ topic.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 material-input">
+                                <label for="material" class="form-label">Material*</label>
+                                <select class="form-select" id="material" name="material">
+                                    <option value="">Select material</option>
+                                    {% for material in materials %}
+                                        <option value="{{ material.0 }}">{{ material.0 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 denomination-input">
                                 <label for="denomination" class="form-label">Denomination*</label>
                                 <input type="text" 
                                        class="form-control" 
@@ -37,13 +74,10 @@
                                        name="denomination" 
                                        pattern="^\d+\s[A-Za-z]+(\s[A-Za-z]+)*$"
                                        title="Format: number followed by single space and word(s) (e.g. '25 penc' or '1 pound sterling')"
-                                       required>
+                                    >
                                 <div class="form-text">Examples: 25 penc, 1 pound sterling</div>
                             </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-6 year-input">
                                 <label for="year" class="form-label">Year*</label>
                                 <input type="number" 
                                        class="form-control" 
@@ -53,73 +87,40 @@
                                        max="9999"
                                        pattern="[0-9]{4}"
                                        title="Please enter a 4-digit year"
-                                       required>
-                            </div>
-                            <div class="col-md-6">
-                                {% comment %} <label for="material" class="form-label">Material</label>
-                                <select class="form-select" id="material" name="material">
-                                    <option value="">Select material</option>
-                                    {% for value, label in material_choices %}
-                                        <option value="{{ value }}">{{ label }}</option>
-                                    {% endfor %}
-                                </select> {% endcomment %}
+                                    >
                             </div>
                         </div>
 
-                        {% comment %} <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="safety" class="form-label">Safety</label>
-                                <select class="form-select" id="safety" name="safety">
-                                    <option value="">Select safety</option>
-                                    {% for value, label in safety_choices %}
-                                        <option value="{{ value }}">{{ label }}</option>
-                                    {% endfor %}
-                                </select>
+                        <div class="row mb-3 content-input">
+                            <div class="col-12">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea class="form-control" id="content" name="content" rows="3"></textarea>
                             </div>
-                            <div class="col-md-6">
-                                <label for="circulation" class="form-label">Circulation</label>
-                                <input type="number" class="form-control" id="circulation" name="circulation">
-                            </div>
-                        </div> {% endcomment %}
-
-                        {% comment %} <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="weight" class="form-label">Weight (g)</label>
-                                <input type="number" step="0.01" class="form-control" id="weight" name="weight">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="diameter" class="form-label">Diameter (mm)</label>
-                                <input type="number" step="0.01" class="form-control" id="diameter" name="diameter">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="thickness" class="form-label">Thickness (mm)</label>
-                                <input type="number" step="0.01" class="form-control" id="thickness" name="thickness">
-                            </div>
-                        </div> {% endcomment %}
+                        </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-6 img_front-input">
                                 <label for="img_front" class="form-label">Front Image*</label>
-                                <input type="file" class="form-control" id="img_front" name="img_front" accept="image/*" required>
+                                <input type="file" class="form-control" id="img_front" name="img_front" accept="image/*">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 img_back-input">
                                 <label for="img_back" class="form-label">Back Image*</label>
-                                <input type="file" class="form-control" id="img_back" name="img_back" accept="image/*" required>
+                                <input type="file" class="form-control" id="img_back" name="img_back" accept="image/*">
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
+                        <div class="row mb-3 img_add_1-input">
+                            <div class="col-md-6 img_add_1-input">
                                 <label for="img_add_1" class="form-label">Additional Image 1</label>
                                 <input type="file" class="form-control" id="img_add_1" name="img_add_1" accept="image/*">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 img_add_2-input">
                                 <label for="img_add_2" class="form-label">Additional Image 2</label>
                                 <input type="file" class="form-control" id="img_add_2" name="img_add_2" accept="image/*">
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row mb-3 coin_category-input">
                             <div class="col-md-12">
                                 <label class="form-label">Categories</label>
                                 <div class="category-checkboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem;">
@@ -157,12 +158,71 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
+        console.log('Document ready - initializing...');
+        
         $('.select2-multiple').select2({
             theme: 'bootstrap-5',
             placeholder: 'Select categories',
             allowClear: true,
             width: '100%'
         });
+        
+        let fields_config = {{ fields_config|safe }};
+        
+        function get_fields_config(type_object_id) {
+            return fields_config.find(config => config.id === type_object_id) || null;
+        }
+        
+        function show_fields(type_object_id='null') {
+            console.log('show_fields called with type_object_id:', type_object_id);
+            $('.country-input').hide();
+            $('.topic-input').hide();
+            $('.year-input').hide();
+            $('.name-input').hide();
+            $('.denomination-input').hide();
+            $('.material-input').hide();
+            $('.content-input').hide();
+            $('.img_front-input').hide();
+            $('.img_back-input').hide();
+            $('.img_add_1-input').hide();
+            $('.img_add_2-input').hide();
+            $('.category-input').hide();
+
+            type_object_id = type_object_id === 'null' ? 'null' : parseInt(type_object_id);
+            
+            let config = get_fields_config(type_object_id);
+            console.log('Found config:', config);
+            if (config) {
+                config.fields.forEach(field => {
+                    $(`.${field}-input`).show();
+                });
+            }
+        }
+
+        show_fields('null');
+        // Спробуємо кілька способів прив'язки обробника
+        let $typeObject = $('#type_object');
+        console.log('Found type_object element:', $typeObject.length);
+        
+        if ($typeObject.length > 0) {
+            $typeObject.on('change', function() {
+                console.log('type_object changed to', $(this).val());
+                show_fields($(this).val());
+            });
+            console.log('Event handler attached to #type_object');
+        } else {
+            console.error('Element #type_object not found!');
+        }
+        
+        // Також спробуємо через name селектор
+        let $typeObjectByName = $('[name="type_object"]');
+        if ($typeObjectByName.length > 0 && $typeObject.length === 0) {
+            $typeObjectByName.on('change', function() {
+                console.log('type_object (by name) changed to', $(this).val());
+                show_fields($(this).val());
+            });
+            console.log('Event handler attached to [name="type_object"]');
+        }
     });
 </script>
 {% endblock %}

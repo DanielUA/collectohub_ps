@@ -24,33 +24,33 @@
 
         {% if not multi_offer.valid_offer %}
         <div class="alert alert-danger my-3">
-            The offer is not valid, the coins have already been exchanged
+            The offer is not valid, the objects have already been exchanged
         </div>
         {% endif %}
         {% if user.id == multi_offer.responder.id %}
             {% if not multi_offer.valid_offer_for_accept and multi_offer.status == 'c' %}
             <div class="alert alert-warning my-3">
-                <strong>Coins not verified</strong>
-                <p>If you accept the offer, you must check when the {{ multi_offer.who_must_verify_coins }} will verify the coins, after which you can complete the exchange</p>
+                <strong>Objects not verified</strong>
+                <p>If you accept the offer, you must check when the {{ multi_offer.who_must_verify_coins }} will verify the objects, after which you can complete the exchange</p>
             </div>
             {% endif %}
             {% if multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
             <div class="alert alert-success my-3">
-                <strong>The offer is accepted, the coins is verified</strong>
+                <strong>The offer is accepted, the objects is verified</strong>
                 <p>You can now exchange the coins. Please, click on the button below to exchange the coins.</p>
             </div>
             {% endif %}
         {% endif %}
         {% if not multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
         <div class="alert alert-warning my-3">
-            <strong>The offer is accepted, but the coins is not verified</strong>
-            <p>The {{ multi_offer.who_must_verify_coins }} must verify the coins within 7 days</p>
+            <strong>The offer is accepted, but the objects is not verified</strong>
+            <p>The {{ multi_offer.who_must_verify_coins }} must verify the objects within 7 days</p>
         </div>
         {% endif %}
         {% if user.id == multi_offer.author.id and multi_offer.valid_offer_for_accept and multi_offer.status == 'a' %}
         <div class="alert alert-success my-3">
-            <strong>The offer is accepted, the coins is verified</strong>
-            <p>The responder can now exchange the coins.</p>
+            <strong>The offer is accepted, the objects is verified</strong>
+            <p>The responder can now exchange the objects.</p>
         </div>
         {% endif %}
 
@@ -98,7 +98,7 @@
             </div>
         </div>
 
-        <p>{{ multi_offer.responder }}'s coins:</p>
+        <p>{{ multi_offer.responder }}'s objects:</p>
         <div class="row">
             {% for coin in multi_offer.coins_to_get.all %}
                 {% include 'coins/elements/offer_coin_card.html' %}
@@ -107,7 +107,7 @@
 
         <hr>
 
-        <p>your coins:</p>
+        <p>your objects:</p>
         <div class="row">
             {% for coin in multi_offer.coins_to_give.all %}
                 {% include 'coins/elements/offer_coin_card.html' %}

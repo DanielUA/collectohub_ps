@@ -195,6 +195,38 @@ class CoinCategory(models.Model):
         if self.parent:
             return f"{self.parent.name} > {self.name}"
         return self.name
+    
+    
+class TypeObject(models.Model):
+    name = models.CharField(max_length=150)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
+    ordering = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Type Object"
+        verbose_name_plural = "Types Objects"
+        ordering = ['ordering']
+        
+
+class Topic(models.Model):
+    name = models.CharField(max_length=150, unique=True)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
+    ordering = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Topic"
+        verbose_name_plural = "Topics"
+        ordering = ['ordering']
 
 
 safety_choices = [('v', 'v'), ('vf', 'vf'), ('f', 'f'), ('xf', 'xf')]
@@ -222,6 +254,9 @@ status_choices_coin = [('a', 'active'), ('n', 'not active'), ('e', 'exchanged'),
 
 
 class Coin(models.Model):
+    type_object = models.ForeignKey(TypeObject, on_delete=models.SET_NULL, related_name='object_coins', blank=True, null=True)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, related_name='topic_coins', blank=True, null=True)
+    name = models.CharField(max_length=300, blank=True, null=True)
     img_front = models.ImageField(upload_to='products_image', blank=True)
     img_back = models.ImageField(upload_to='products_image', blank=True)
     img_add_1 = models.ImageField(upload_to='products_image', blank=True)
