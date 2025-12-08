@@ -8,7 +8,7 @@
                 <i class="bi bi-funnel"></i> Show Filters
             </button>
             <a href="{% url 'coins:coin-create' %}" class="btn btn-success">
-                <i class="bi bi-plus"></i> Add Coin
+                <i class="bi bi-plus"></i> Add Object
             </a>
         </div>
 
@@ -26,7 +26,7 @@
                         <option value="1" {% if verified == '1' %}selected{% endif %}>Verified</option>
                         <option value="0" {% if verified == '0' %}selected{% endif %}>Unverified</option>
                     </select>
-                    <input type="text" name="search" class="form-control" placeholder="Search coins..." value="{% if search %}{{ search }}{% endif %}">
+                    <input type="text" name="search" class="form-control" placeholder="Search objects..." value="{% if search %}{{ search }}{% endif %}">
                     <input type="submit" value="Apply filters" class="btn btn-primary" />
                 </div>
             </form>
@@ -61,7 +61,7 @@
     
     <div class="form-check mb-3">
         <input class="form-check-input select-all" type="checkbox" />
-        <label class="form-check-label" for="flexCheckDefault">Select all coins</label>
+        <label class="form-check-label" for="flexCheckDefault">Select all objects</label>
     </div>
 
     <div class="row">
@@ -70,7 +70,7 @@
             <div class="card mb-3">
                 <a href="{% url 'coins:coin-detail' pk=coin.id %}">
                     {% if coin.img_front %}
-                    <img src="{{ coin.img_front.url }}" alt="coin" class="card-img-top" />
+                    <img src="{{ coin.img_front.url }}" alt="object" class="card-img-top" />
                     {% else %}
                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
                         <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
@@ -80,7 +80,14 @@
                 </a>
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title mb-0">{{ coin.denomination|title }} {{ coin.year }}</h6>
+                        <h6 class="card-title mb-0">
+                            {% if coin.name %}
+                            {{ coin.name }}
+                            {% else %}
+                            {{ coin.denomination|title }}
+                            {% endif %}
+                             {{ coin.year }}
+                        </h6>
                         {% if coin.box %}
                         <span class="text-success d-flex align-items-center gap-1" title="Підтверджена">
                             <i class="bi bi-check-circle-fill"></i>
@@ -106,7 +113,7 @@
                     <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="coins" value="{{coin.id}}" id="flexCheckDefault" />
-                            <label class="form-check-label" for="flexCheckDefault"> Select coin </label>
+                            <label class="form-check-label" for="flexCheckDefault"> Select object </label>
                         </div>
                         <div>
                             {% if not coin.box %}

@@ -1,8 +1,8 @@
 {% extends 'coins/base.html' %} 
-{% block title %}{% if continent.title and continent.title != '' %}{{ continent.title }}{% else %}Coin Exchange from {{ continent.name }} – Collectible Coins Catalog | CollectoHub {% endif %} {% endblock %} 
-{% block description %}{% if continent.description and continent.description != '' %}{{ continent.description }}{% else %}Explore collectible coins from {{ continent.name }} ➤ View and exchange rare coins with fellow collectors. Easy-to-use catalog for coin exchange. {% endif %} {% endblock %}
+{% block title %}{% if continent.title and continent.title != '' %}{{ continent.title }}{% else %}Object Exchange from {{ continent.name }} – Collectible Objects Catalog | CollectoHub {% endif %} {% endblock %} 
+{% block description %}{% if continent.description and continent.description != '' %}{{ continent.description }}{% else %}Explore collectible objects from {{ continent.name }} ➤ View and exchange rare objects with fellow collectors. Easy-to-use catalog for object exchange. {% endif %} {% endblock %}
 {% block content %}
-<h1>Coins of {{ continent.name }}</h1>
+<h1>Objects of {{ continent.name }}</h1>
 <div class="row">
     <div class="col-md-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">

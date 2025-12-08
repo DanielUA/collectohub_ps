@@ -11,7 +11,7 @@ multioffer to {{recipient}}
     
     <div class="row">
     <div class="col-6">
-        <h3>{{ recipient}}'s coins</h3>
+        <h3>{{ recipient}}'s objects</h3>
             {% for coin in recipient.profile.active_coins %}
                 <div>
                     <input type="checkbox" name="coins_to_get_ids" value="{{ coin.id }}">
@@ -28,7 +28,7 @@ multioffer to {{recipient}}
             {% endfor %}        
     </div>
     <div class="col-6">
-        <h3>{{ user }}'s coins</h3>
+        <h3>{{ user }}'s objects</h3>
         
             {% for coin in user.profile.active_coins %}
                 <div>

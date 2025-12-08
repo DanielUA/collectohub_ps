@@ -28,7 +28,7 @@
                         <a class="text-decoration-none" href="{% url 'coins:user-cabinet-coins' %}">
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="ms-2 me-auto">
-                                    <div class="fw-bold">My coins</div>
+                                    <div class="fw-bold">My objects</div>
                                 </div>
                                 <span class="badge bg-primary rounded-pill">{{user.profile.active_coins.count}}</span>
                             </li>
@@ -36,7 +36,7 @@
                         <a class="text-decoration-none" href="{% url 'coins:user-cabinet-coins-on-verification' %}">
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="ms-2 me-auto">
-                                    <div class="fw-bold">Coins on verification</div>
+                                    <div class="fw-bold">Objects on verification</div>
                                 </div>
                                 <span class="badge bg-primary rounded-pill">{{user.profile.coins_on_verification.count}}</span>
                             </li>
@@ -44,7 +44,7 @@
                         <a class="text-decoration-none" href="{% url 'coins:user-cabinet-exchanged-coins' %}">
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="ms-2 me-auto">
-                                    <div class="fw-bold">Exchanged coins</div>
+                                    <div class="fw-bold">Exchanged objects</div>
                                 </div>
                                 <span class="badge bg-primary rounded-pill">{{user.profile.exchanged_coins.count}}</span>
                             </li>
@@ -60,7 +60,7 @@
                         <a class="text-decoration-none" href="{% url 'coins:user-cabinet-sent' %}">
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="ms-2 me-auto">
-                                    <div class="fw-bold">Coin sent</div>
+                                    <div class="fw-bold">Object sent</div>
                                 </div>
                                 <span class="badge bg-secondary rounded-pill">{{user.profile.coins_sent.count}}</span>
                             </li>

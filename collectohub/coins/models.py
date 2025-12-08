@@ -350,7 +350,7 @@ class Coin(models.Model):
                 for offer in multi_offers:
                     # Message for author
                     Message.objects.create(
-                        text=f'Coin {self.country.name} {self.denomination} {self.year} has been verified. The offer is ready for confirmation.',
+                        text=f'Object {self.country.name} {self.denomination if self.denomination else self.name} {self.year} has been verified. The offer is ready for confirmation.',
                         author=User.objects.get(id=1),
                         recipient=offer.author,
                         topic='Offer Update'
@@ -358,7 +358,7 @@ class Coin(models.Model):
                     
                     # Message for responder
                     Message.objects.create(
-                        text=f'Coin {self.country.name} {self.denomination} {self.year} has been verified. The offer is ready for confirmation.',
+                        text=f'Object {self.country.name} {self.denomination if self.denomination else self.name} {self.year} has been verified. The offer is ready for confirmation.',
                         author=User.objects.get(id=1),
                         recipient=offer.responder,
                         topic='Offer Update'
@@ -435,8 +435,8 @@ class Message(models.Model):
         
         if is_new:
             try:
-                subject = f'Нове повідомлення на CollectoHub: {self.topic}'
-                message = f'Ви отримали нове повідомлення від {self.author.username}:\n\n{self.text}'
+                subject = f'New message on CollectoHub: {self.topic}'
+                message = f'You have received a new message from {self.author.username}:\n\n{self.text}'
                 from_email = settings.DEFAULT_FROM_EMAIL
                 recipient_list = [self.recipient.email]
                 
