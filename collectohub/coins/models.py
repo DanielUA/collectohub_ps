@@ -170,6 +170,7 @@ class CoinCategory(models.Model):
     content = RichTextField(blank=True, null=True)
     countries = models.ManyToManyField(Country, blank=True, related_name='coin_categories')
     continents = models.ManyToManyField(Continent, blank=True, related_name='coin_categories')
+    type_objects = models.ManyToManyField('TypeObject', blank=True, related_name='coin_categories')
     ordering = models.IntegerField(default=0)
 
     class Meta:
@@ -211,6 +212,9 @@ class TypeObject(models.Model):
         verbose_name = "Type Object"
         verbose_name_plural = "Types Objects"
         ordering = ['ordering']
+    
+    def get_active_coins(self):
+        return Coin.objects.filter(type_object=self, status="a")
         
 
 class Topic(models.Model):

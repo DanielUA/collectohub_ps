@@ -1,5 +1,8 @@
 {% extends 'coins/base.html' %} {% block title %} Collecto Hub {% endblock %} {% block content %}
 <div class="row">
+    <div class="col-md-12">
+        <h1>{{ typeobject.name|title }}</h1>
+    </div>
     <div class="col-md-3 mb-3">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container-fluid">
@@ -42,24 +45,6 @@
                                     <li class="dropdown-item">
                                         <a href="{% url 'coins:continent-detail' continent.id %}" class="text text-decoration-none">
                                             {{ continent.name }}
-                                        </a>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </li>
-                        {% endif %}
-                        {% if typeobject_list|length > 0 %}
-                        <li class="list-group-item">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop4" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Type Objects
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop4" style="max-height: 200px; overflow-y: auto;">
-                                    {% for typeobject in typeobject_list %}
-                                    <li class="dropdown-item">
-                                        <a href="{% url 'coins:objects-types-detail' typeobject.id %}" class="text text-decoration-none">
-                                            {{ typeobject.name|title }}
                                         </a>
                                     </li>
                                     {% endfor %}
@@ -110,7 +95,7 @@
     <div class="col-md-9">
         {% include 'coins/elements/sort_field.html' %}
         <div class="row">
-            {% for coin in page_obj %}
+            {% for coin in coins %}
                 {% include 'coins/elements/coin_card.html' with coin=coin %}
             {% endfor %}
         </div>

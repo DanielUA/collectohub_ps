@@ -41,6 +41,7 @@ class IndexView(ListView):
     extra_context = {
         "continent_list": Continent.objects.all().order_by("name"),
         "coin_categories": CoinCategory.objects.filter(parent=None, countries=None, continents=None),
+        "typeobject_list": TypeObject.objects.all(),
     }
     paginate_by = 12
 
@@ -742,6 +743,7 @@ class ContinentDetailView(DetailView):
         coins = self.object.get_active_coins()
 
         # Додаємо додаткові змінні до контексту
+        context["coin_categories"] = CoinCategory.objects.filter(continents__id=self.object.id)
         context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
         context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
         context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
@@ -789,6 +791,7 @@ class CountryDetailView(DetailView):
         coins = self.object.get_active_coins()
 
         # Додаємо додаткові змінні до контексту
+        context["coin_categories"] = CoinCategory.objects.filter(countries__id=self.object.id)
         context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
         context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
         context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
@@ -824,6 +827,52 @@ class CountryDetailView(DetailView):
         
         return context
     
+    
+class ObjectsTypesDetailView(DetailView):
+    model = TypeObject
+    
+    def get_context_data(self, **kwargs):
+        # Отримуємо стандартний контекст від DetailView
+        context = super().get_context_data(**kwargs)
+        
+        # Додаємо свій контекст
+        coins = self.object.get_active_coins()
+        # Додаємо додаткові змінні до контексту
+        context["coin_categories"] = CoinCategory.objects.filter(type_objects__id=self.object.id)
+        context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        sort = cookies.get('sort')
+        
+        if min_year != '' and min_year is not None:
+            coins = coins.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            coins = coins.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            coins = coins.filter(denomination__in=denomination)
+        
+        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+            coins = coins.order_by(sort)
+            
+        paginator = Paginator(coins, 12)
+        page = self.request.GET.get("page", 1)
+
+        try:
+            coins = paginator.page(page)
+        except PageNotAnInteger:
+            coins = paginator.page(1)
+        except EmptyPage:
+            coins = paginator.page(paginator.num_pages)
+        context['coins'] = coins
+        
+        return context
     
 class CoinCategoryDetailView(DetailView):
     model = CoinCategory
