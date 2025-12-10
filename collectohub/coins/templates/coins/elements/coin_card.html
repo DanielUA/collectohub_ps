@@ -10,7 +10,7 @@
         {% endif %}
     </a>
     <div class="mt-2">
-        <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
+        <div class="d-flex justify-content-center flex-wrap align-items-center gap-2 mb-1">
             <span>{{ coin.country }}</span>
             {% if coin.box %}
             <span class="text-success d-flex align-items-center" title="Підтверджена">
@@ -24,6 +24,13 @@
             </span>
             {% endif %}
         </div>
-        <span class="d-block">{{ coin.denomination|title }} {{ coin.year }}</span>        
+        <span class="d-block">
+            {% if coin.name %}
+            {{ coin.name }}
+            {% else %}
+            {{ coin.denomination|title }}
+            {% endif %}
+             {{ coin.year }}
+        </span>        
     </div>
 </div> 

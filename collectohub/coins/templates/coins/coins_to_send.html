@@ -3,11 +3,11 @@
 {% block robots %}noindex, nofollow{% endblock %}
 
 {% block title %}
-    Coins to send
+    Objects to send
 {% endblock %}
 
 {% block content %}
-    <h1>Coins to send</h1>
+    <h1>Objects to send</h1>
     <div class="row">
     {% for user in users %}
         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
@@ -26,7 +26,7 @@
                         <div>Address: {{ user.profile.city }}, {{ user.profile.addres }}, {{ user.profile.postcode }}</div>
                         <div>Email: {{ user.email }}</div>
                         <div>Phone: {{ user.profile.phone }}</div>
-                        <div>Coins to send: <span class="badge bg-primary rounded-pill">{{ user.profile.coins_wait_for_delivery.count }}</span></div>
+                        <div>Objects to send: <span class="badge bg-primary rounded-pill">{{ user.profile.coins_wait_for_delivery.count }}</span></div>
                     </div>
                 </div>
             </a>

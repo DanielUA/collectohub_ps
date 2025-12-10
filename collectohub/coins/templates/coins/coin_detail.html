@@ -1,8 +1,8 @@
 {% extends 'coins/base.html' %}
 
 
-{% block title %}{% if coin.title and coin.title != '' %}{{ coin.title }}{% else %}{{ coin.denomination|title}} {{ coin.year }} – Exchange, Details, Specs | CollectoHub {% endif %} {% endblock %} 
-{% block description %}{% if coin.description and coin.description != '' %}{{ coin.description }}{% else %}Exchange the “{{ coin.denomination|title}}” issued in {{ coin.year }} ➤ Full details, images, and specifications. Safe collector exchange on CollectoHub. {% endif %} {% endblock %}
+{% block title %}{% if coin.title and coin.title != '' %}{{ coin.title }}{% else %}{% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title}} {% endif %} {{ coin.year }} – Exchange, Details, Specs | CollectoHub {% endif %} {% endblock %} 
+{% block description %}{% if coin.description and coin.description != '' %}{{ coin.description }}{% else %}Exchange the “{% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title}} {% endif %}” issued in {{ coin.year }} ➤ Full details, images, and specifications. Safe collector exchange on CollectoHub. {% endif %} {% endblock %}
 {% block style %}
 <style>
   .modal-content {
@@ -23,7 +23,7 @@
             <div class="carousel-inner">
               <div class="carousel-item active">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_front.url }}" class="d-block w-100" alt="Front side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
+                <img src="{{ coin.img_front.url }}" class="d-block w-100" alt="Front side of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -34,7 +34,7 @@
               </div>
               <div class="carousel-item">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_back.url }}" class="d-block w-100" alt="Back side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
+                <img src="{{ coin.img_back.url }}" class="d-block w-100" alt="Back side of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -46,7 +46,7 @@
               {% if coin.img_add_1 %}
               <div class="carousel-item">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_add_1.url }}" class="d-block w-100" alt="Additional view 1 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
+                <img src="{{ coin.img_add_1.url }}" class="d-block w-100" alt="Additional view 1 of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -59,7 +59,7 @@
               {% if coin.img_add_2 %}
               <div class="carousel-item">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_add_2.url }}" class="d-block w-100" alt="Additional view 2 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">
+                <img src="{{ coin.img_add_2.url }}" class="d-block w-100" alt="Additional view 2 of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">
                 {% else %}
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
@@ -83,19 +83,19 @@
       
         <div class="row mt-2">
             <div class="col-3">            
-            <img id='img-front' class="w-100" src="{{ coin.img_front.url }}" alt="Front side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">     
+            <img id='img-front' class="w-100" src="{{ coin.img_front.url }}" alt="Front side of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">     
             </div>
             <div class="col-3">
-                <img id="img-back" class="w-100" src="{{ coin.img_back.url }}" alt="Back side of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">                
+                <img id="img-back" class="w-100" src="{{ coin.img_back.url }}" alt="Back side of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">                
             </div>
             {% if coin.img_add_1 %}
             <div class="col-3">
-                <img id="img-add-1" class="w-100" src="{{ coin.img_add_1.url }}" alt="Additional view 1 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">                
+                <img id="img-add-1" class="w-100" src="{{ coin.img_add_1.url }}" alt="Additional view 1 of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">                
             </div>
             {% endif %} 
             {% if coin.img_add_2 %}
             <div class="col-3">
-                <img id="img-add-2" class="w-100" src="{{ coin.img_add_2.url }}" alt="Additional view 2 of {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} coin">                
+                <img id="img-add-2" class="w-100" src="{{ coin.img_add_2.url }}" alt="Additional view 2 of {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} object">                
             </div>
             {% endif %}
         </div>
@@ -123,7 +123,7 @@
                         <small class="ms-1">Unverified</small>
                     </span>
                     {% endif %}
-                    {{ coin.country }} {{ coin.denomination|title }} {{ coin.year }} 
+                    {{ coin.country }} {% if coin.name %}{{ coin.name }}{% else %}{{ coin.denomination|title }} {% endif %} {{ coin.year }} 
                     
                </p>
                <p class="fs-3">

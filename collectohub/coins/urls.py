@@ -40,6 +40,7 @@ urlpatterns = [
     path('category/<int:pk>/', views.CoinCategoryDetailView.as_view(), name='coin-category-detail'),
     path('continent/<int:pk>/', views.ContinentDetailView.as_view(), name='continent-detail'),
     path('country/<int:pk>/', views.CountryDetailView.as_view(), name='country-detail'),
+    path('objects-types/<int:pk>/', views.ObjectsTypesDetailView.as_view(), name='objects-types-detail'),
     path('coins/send/', views.CoinsToSendListView.as_view(), name='coins-to-send'),
     path('coins/send/<int:pk>/', views.CoinsToSendUserListView.as_view(), name='coins-to-send-user'),
     path('coin/sended/', views.coin_sended, name='coins-sended'),

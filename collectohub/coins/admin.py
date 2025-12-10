@@ -21,6 +21,14 @@ class ContinentsAdmin(admin.ModelAdmin):
 @admin.register(Country)
 class CountriesAdmin(admin.ModelAdmin):
     list_display = ['name']
+    
+@admin.register(Topic)
+class TopicsAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    
+@admin.register(TypeObject)
+class TypeObjectsAdmin(admin.ModelAdmin):
+    list_display = ['name']
 
 @admin.register(Coin)
 class CoinAdmin(admin.ModelAdmin):
@@ -88,7 +96,7 @@ class CoinCategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'parent', 'get_countries', 'get_continents']
     search_fields = ['name', 'parent__name', 'countries__name', 'continents__name']
     list_filter = ['parent', 'countries', 'continents']
-    filter_horizontal = ['countries', 'continents']
+    filter_horizontal = ['countries', 'continents', 'type_objects']
     ordering = ['ordering']
     
     class Media:

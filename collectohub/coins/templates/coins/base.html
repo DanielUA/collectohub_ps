@@ -83,10 +83,13 @@
                         <option value="2">
                             denomination
                         </option>
+                        <option value="3">
+                            name
+                        </option>
                     </select>
                         </div>
                         <div class="col-9">
-                            <input class="form-control" type="text" name="search_field" placeholder="coin search">
+                            <input class="form-control" type="text" name="search_field" placeholder="Search">
                         </div>
                     </div>
 
@@ -123,7 +126,7 @@
                     {% endif %}
                     {% if user.is_superuser %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'coins:coins-to-send' %}">Coins for Send</a>
+                        <a class="nav-link" href="{% url 'coins:coins-to-send' %}">Objects for Send</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
@@ -207,5 +210,6 @@
     {% for script in global_scripts_body_bottom %}
         {{ script.content|safe }}
     {% endfor %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

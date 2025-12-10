@@ -41,6 +41,7 @@ class IndexView(ListView):
     extra_context = {
         "continent_list": Continent.objects.all().order_by("name"),
         "coin_categories": CoinCategory.objects.filter(parent=None, countries=None, continents=None),
+        "typeobject_list": TypeObject.objects.all(),
     }
     paginate_by = 12
 
@@ -742,6 +743,7 @@ class ContinentDetailView(DetailView):
         coins = self.object.get_active_coins()
 
         # Додаємо додаткові змінні до контексту
+        context["coin_categories"] = CoinCategory.objects.filter(continents__id=self.object.id)
         context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
         context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
         context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
@@ -789,6 +791,7 @@ class CountryDetailView(DetailView):
         coins = self.object.get_active_coins()
 
         # Додаємо додаткові змінні до контексту
+        context["coin_categories"] = CoinCategory.objects.filter(countries__id=self.object.id)
         context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
         context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
         context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
@@ -824,6 +827,52 @@ class CountryDetailView(DetailView):
         
         return context
     
+    
+class ObjectsTypesDetailView(DetailView):
+    model = TypeObject
+    
+    def get_context_data(self, **kwargs):
+        # Отримуємо стандартний контекст від DetailView
+        context = super().get_context_data(**kwargs)
+        
+        # Додаємо свій контекст
+        coins = self.object.get_active_coins()
+        # Додаємо додаткові змінні до контексту
+        context["coin_categories"] = CoinCategory.objects.filter(type_objects__id=self.object.id)
+        context["min_year"] = coins.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = coins.aggregate(max=Max('year'))['max'] or 0
+        context["list_denomination"] = coins.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо фільтри з кукі, якщо вони є
+        cookies = self.request.COOKIES
+        min_year = cookies.get('min_year')
+        max_year = cookies.get('max_year')
+        denomination = cookies.get('denomination')
+        sort = cookies.get('sort')
+        
+        if min_year != '' and min_year is not None:
+            coins = coins.filter(year__gte=min_year)
+        if max_year != '' and max_year is not None:
+            coins = coins.filter(year__lte=max_year)
+        if denomination is not None and denomination != '':
+            denomination = denomination.split(',')
+            coins = coins.filter(denomination__in=denomination)
+        
+        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+            coins = coins.order_by(sort)
+            
+        paginator = Paginator(coins, 12)
+        page = self.request.GET.get("page", 1)
+
+        try:
+            coins = paginator.page(page)
+        except PageNotAnInteger:
+            coins = paginator.page(1)
+        except EmptyPage:
+            coins = paginator.page(paginator.num_pages)
+        context['coins'] = coins
+        
+        return context
     
 class CoinCategoryDetailView(DetailView):
     model = CoinCategory
@@ -944,16 +993,50 @@ def validate_image(image):
     if ext not in valid_extensions:
         raise ValidationError(f"Only {', '.join(valid_extensions)} files are allowed")
 
+# Спільна конфігурація полів для CreateCoin та UpdateCoin
+FIELDS_CONFIG = [
+    {
+        'id': 1,
+        'fields': ['country', 'topic', 'year', 'name', 'coin_category', 'content', 'img_front', 'img_back']
+    },
+    {
+        'id': 2,
+        'fields': ['country', 'topic', 'year', 'name', 'coin_category', 'content', 'img_front', 'img_back']
+    },
+    {
+        'id': 3,
+        'fields': ['country', 'topic', 'year', 'name', 'coin_category', 'content', 'img_front', 'img_back']
+    },
+    {
+        'id': 4,
+        'fields': ['country', 'year', 'denomination', 'coin_category', 'content', 'img_front', 'img_back', 'img_add_1', 'img_add_2', 'safety', 'circulation', 'weight', 'diameter', 'thickness']
+    },
+    {
+        'id': 5,
+        'fields': ['country', 'year', 'name', 'coin_category', 'content', 'img_front', 'img_back']
+    },
+    {
+        'id': 6,
+        'fields': ['material', 'country', 'year', 'denomination', 'coin_category', 'content', 'img_front', 'img_back', 'img_add_1', 'img_add_2', 'safety', 'circulation', 'weight', 'diameter', 'thickness']
+    },
+    {
+        'id': 'null',
+        'fields': ['country', 'year', 'name', 'coin_category', 'content', 'img_front', 'img_back']
+    },
+]
+
 class CreateCoin(LoginRequiredMixin, View):
     login_url = 'coins:signin'  # URL to redirect to if user is not logged in
     
-    @staticmethod
-    def get(request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         context = {
             'countries': Country.objects.all().order_by('name'),
             'coin_categories': CoinCategory.objects.all().order_by('name'),
-            'material_choices': material_choices,
             'safety_choices': safety_choices,
+            'topics': Topic.objects.all().order_by('name'),
+            'type_objects': TypeObject.objects.all(),
+            'materials': material_choices,
+            'fields_config': FIELDS_CONFIG,
         }
         return render(
             request,
@@ -966,8 +1049,11 @@ class CreateCoin(LoginRequiredMixin, View):
             'errors': {},
             'countries': Country.objects.all().order_by('name'),
             'coin_categories': CoinCategory.objects.all().order_by('name'),
-            'material_choices': material_choices,
             'safety_choices': safety_choices,
+            'topics': Topic.objects.all().order_by('name'),
+            'type_objects': TypeObject.objects.all(),
+            'materials': material_choices,
+            'fields_config': FIELDS_CONFIG,
         }
         
         try:
@@ -982,17 +1068,47 @@ class CreateCoin(LoginRequiredMixin, View):
             diameter = request.POST.get('diameter')
             thickness = request.POST.get('thickness')
             circulation = request.POST.get('circulation')
-
-            # Validate required fields
-            if not country_id:
-                context['errors'] = 'Country is required'
-            if not denomination:
-                context['errors'] = 'Denomination is required'
-            if not year:
-                context['errors'] = 'Year is required'
+            type_object = request.POST.get('type_object')
+            topic = request.POST.get('topic')
+            name = request.POST.get('name')
+            content = request.POST.get('content')
+            
+            fields_config = None
+            print(type_object)
+            for config in FIELDS_CONFIG:
+                if str(config['id']) == str(type_object):
+                    fields_config = config
+                    break
+            if not fields_config:
+                context['errors'] = 'Type object is required'
+                return render(request, 'coins/user_cabinet/create_coin.html', context)
+            # Опціональні поля, які не повинні бути обов'язковими
+            optional_fields = ['safety', 'circulation', 'weight', 'diameter', 'thickness', 'material', 'content']
+            
+            fields = fields_config['fields']
+            for field in fields:
+                if 'img_' in field:
+                    continue
+                # Пропускаємо опціональні поля
+                if field in optional_fields:
+                    continue
+                if field == 'coin_category':
+                    # coin_category is a list, check if at least one is selected
+                    coin_category = request.POST.getlist('coin_category')
+                    if not coin_category:
+                        context['errors'] = f'{field} is required for this type object'
+                        return render(request, 'coins/user_cabinet/create_coin.html', context)
+                else:
+                    print(field, request.POST.get(field))
+                    if not request.POST.get(field):
+                        context['errors'] = f'{field} is required for this type object'
+                        return render(request, 'coins/user_cabinet/create_coin.html', context)   
 
             # Validate all image fields
-            required_images = ['img_front', 'img_back', 'img_add_1', 'img_add_2']
+            required_images = []
+            for field in fields:
+                if 'img_' in field:
+                    required_images.append(field)
             for img_field in required_images:
                 if img_field not in request.FILES:
                     context['errors'] = f'All images are required'
@@ -1018,12 +1134,16 @@ class CreateCoin(LoginRequiredMixin, View):
                     diameter=float(diameter) if diameter else None,
                     thickness=float(thickness) if thickness else None,
                     circulation=int(circulation) if circulation else None,
+                    type_object=TypeObject.objects.get(id=type_object) if type_object else None,
+                    topic=Topic.objects.get(id=topic) if topic else None,
+                    name=name,
+                    content=content,
                     owner=request.user,
                     status='a',  # Set default status to active
-                    img_front=request.FILES['img_front'],
-                    img_back=request.FILES['img_back'],
-                    img_add_1=request.FILES['img_add_1'],
-                    img_add_2=request.FILES['img_add_2']
+                    img_front=request.FILES['img_front'] if 'img_front' in request.FILES else None,
+                    img_back=request.FILES['img_back'] if 'img_back' in request.FILES else None,
+                    img_add_1=request.FILES['img_add_1'] if 'img_add_1' in request.FILES else None,
+                    img_add_2=request.FILES['img_add_2'] if 'img_add_2' in request.FILES else None,
                 )
 
                 coin.save()
@@ -1052,6 +1172,10 @@ class UpdateCoin(LoginRequiredMixin, View):
                 'coin_categories': CoinCategory.objects.all().order_by('name'),
                 'material_choices': material_choices,
                 'safety_choices': safety_choices,
+                'topics': Topic.objects.all().order_by('name'),
+                'type_objects': TypeObject.objects.all(),
+                'materials': material_choices,
+                'fields_config': FIELDS_CONFIG,
             }
             return render(request, 'coins/user_cabinet/update_coin.html', context)
         except Coin.DoesNotExist:
@@ -1069,9 +1193,14 @@ class UpdateCoin(LoginRequiredMixin, View):
                 'coin_categories': CoinCategory.objects.all().order_by('name'),
                 'material_choices': material_choices,
                 'safety_choices': safety_choices,
+                'topics': Topic.objects.all().order_by('name'),
+                'type_objects': TypeObject.objects.all(),
+                'materials': material_choices,
+                'fields_config': FIELDS_CONFIG,
             }
             
             # Get form data
+            type_object = request.POST.get('type_object')
             country_id = request.POST.get('country')
             denomination = request.POST.get('denomination')
             year = request.POST.get('year')
@@ -1082,28 +1211,68 @@ class UpdateCoin(LoginRequiredMixin, View):
             thickness = request.POST.get('thickness')
             circulation = request.POST.get('circulation')
             coin_category = request.POST.getlist('coin_category')
+            topic = request.POST.get('topic')
+            name = request.POST.get('name')
+            content = request.POST.get('content')
+            
+            # Validate type_object and get fields_config
+            fields_config = None
+            for config in FIELDS_CONFIG:
+                if str(config['id']) == str(type_object):
+                    fields_config = config
+                    break
+            if not fields_config:
+                context['errors'] = 'Type object is required'
+                return render(request, 'coins/user_cabinet/update_coin.html', context)
+            
+            # Validate required fields based on type_object
+            # Опціональні поля, які не повинні бути обов'язковими
+            optional_fields = ['safety', 'circulation', 'weight', 'diameter', 'thickness', 'material', 'content']
+            
+            fields = fields_config['fields']
+            for field in fields:
+                if 'img_' in field:
+                    continue
+                # Пропускаємо опціональні поля
+                if field in optional_fields:
+                    continue
+                if field == 'coin_category':
+                    # coin_category is a list, check if at least one is selected
+                    if not coin_category:
+                        context['errors'] = f'{field} is required for this type object'
+                        return render(request, 'coins/user_cabinet/update_coin.html', context)
+                else:
+                    if not request.POST.get(field):
+                        context['errors'] = f'{field} is required for this type object'
+                        return render(request, 'coins/user_cabinet/update_coin.html', context)
 
-            # Validate required fields
-            if not country_id:
-                context['errors'] = 'Country is required'
-            if not denomination:
-                context['errors'] = 'Denomination is required'
-            if not year:
-                context['errors'] = 'Year is required'
-
-            # Validate image fields only if new images are uploaded
-            for img_field in ['img_front', 'img_back', 'img_add_1', 'img_add_2']:
+            # Validate image fields - check if required images exist (either old or new)
+            required_images = []
+            for field in fields:
+                if 'img_' in field:
+                    required_images.append(field)
+            
+            for img_field in required_images:
+                # Check if new image is uploaded
                 if img_field in request.FILES:
                     try:
                         validate_image(request.FILES[img_field])
                     except ValidationError as e:
                         context['errors'] = str(e)
+                        return render(request, 'coins/user_cabinet/update_coin.html', context)
+                else:
+                    # If no new image uploaded, check if old image exists
+                    old_image = getattr(coin, img_field)
+                    if not old_image:
+                        context['errors'] = f'{img_field} is required for this type object'
+                        return render(request, 'coins/user_cabinet/update_coin.html', context)
             
             if context['errors']:
                 return render(request, 'coins/user_cabinet/update_coin.html', context)
 
             with transaction.atomic():
                 # Update coin fields
+                coin.type_object = TypeObject.objects.get(id=type_object) if type_object and type_object != 'null' else None
                 coin.country_id = country_id
                 coin.denomination = denomination
                 coin.year = int(year)
@@ -1113,6 +1282,9 @@ class UpdateCoin(LoginRequiredMixin, View):
                 coin.diameter = float(diameter) if diameter else None
                 coin.thickness = float(thickness) if thickness else None
                 coin.circulation = int(circulation) if circulation else None
+                coin.topic = Topic.objects.get(id=topic) if topic else None
+                coin.name = name if name else ''
+                coin.content = content if content else ''
 
                 # Update images only if new ones are uploaded
                 for img_field in ['img_front', 'img_back', 'img_add_1', 'img_add_2']:
@@ -1310,8 +1482,10 @@ def search_coin(request):
             coins = Coin.objects.filter(country__name__icontains=search_str)
         elif search_option == '2':
             coins = Coin.objects.filter(denomination__icontains=search_str)
+        elif search_option == "3":
+            coins = Coin.objects.filter(name__icontains=search_str)
         elif search_option == "0":
-            coins = Coin.objects.filter(Q(country__name__icontains=search_str) | Q(denomination__icontains=search_str))
+            coins = Coin.objects.filter(Q(country__name__icontains=search_str) | Q(denomination__icontains=search_str) | Q(name__icontains=search_str))
 
         return render(request, template_name="coins/search.html", context={"coin_list": coins, "pattern": search_str})
 

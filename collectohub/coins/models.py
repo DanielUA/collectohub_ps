@@ -170,6 +170,7 @@ class CoinCategory(models.Model):
     content = RichTextField(blank=True, null=True)
     countries = models.ManyToManyField(Country, blank=True, related_name='coin_categories')
     continents = models.ManyToManyField(Continent, blank=True, related_name='coin_categories')
+    type_objects = models.ManyToManyField('TypeObject', blank=True, related_name='coin_categories')
     ordering = models.IntegerField(default=0)
 
     class Meta:
@@ -195,6 +196,41 @@ class CoinCategory(models.Model):
         if self.parent:
             return f"{self.parent.name} > {self.name}"
         return self.name
+    
+    
+class TypeObject(models.Model):
+    name = models.CharField(max_length=150)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
+    ordering = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Type Object"
+        verbose_name_plural = "Types Objects"
+        ordering = ['ordering']
+    
+    def get_active_coins(self):
+        return Coin.objects.filter(type_object=self, status="a")
+        
+
+class Topic(models.Model):
+    name = models.CharField(max_length=150, unique=True)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
+    ordering = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Topic"
+        verbose_name_plural = "Topics"
+        ordering = ['ordering']
 
 
 safety_choices = [('v', 'v'), ('vf', 'vf'), ('f', 'f'), ('xf', 'xf')]
@@ -222,6 +258,9 @@ status_choices_coin = [('a', 'active'), ('n', 'not active'), ('e', 'exchanged'),
 
 
 class Coin(models.Model):
+    type_object = models.ForeignKey(TypeObject, on_delete=models.SET_NULL, related_name='object_coins', blank=True, null=True)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, related_name='topic_coins', blank=True, null=True)
+    name = models.CharField(max_length=300, blank=True, null=True)
     img_front = models.ImageField(upload_to='products_image', blank=True)
     img_back = models.ImageField(upload_to='products_image', blank=True)
     img_add_1 = models.ImageField(upload_to='products_image', blank=True)
@@ -315,7 +354,7 @@ class Coin(models.Model):
                 for offer in multi_offers:
                     # Message for author
                     Message.objects.create(
-                        text=f'Coin {self.country.name} {self.denomination} {self.year} has been verified. The offer is ready for confirmation.',
+                        text=f'Object {self.country.name} {self.denomination if self.denomination else self.name} {self.year} has been verified. The offer is ready for confirmation.',
                         author=User.objects.get(id=1),
                         recipient=offer.author,
                         topic='Offer Update'
@@ -323,7 +362,7 @@ class Coin(models.Model):
                     
                     # Message for responder
                     Message.objects.create(
-                        text=f'Coin {self.country.name} {self.denomination} {self.year} has been verified. The offer is ready for confirmation.',
+                        text=f'Object {self.country.name} {self.denomination if self.denomination else self.name} {self.year} has been verified. The offer is ready for confirmation.',
                         author=User.objects.get(id=1),
                         recipient=offer.responder,
                         topic='Offer Update'
@@ -400,8 +439,8 @@ class Message(models.Model):
         
         if is_new:
             try:
-                subject = f'Нове повідомлення на CollectoHub: {self.topic}'
-                message = f'Ви отримали нове повідомлення від {self.author.username}:\n\n{self.text}'
+                subject = f'New message on CollectoHub: {self.topic}'
+                message = f'You have received a new message from {self.author.username}:\n\n{self.text}'
                 from_email = settings.DEFAULT_FROM_EMAIL
                 recipient_list = [self.recipient.email]
                 

@@ -57,6 +57,10 @@ jQuery("document").ready(function ($) {
             });
         }
         if (cookies.sort) {
+            $('#sortByList li[data-sort="' + cookies.sort + '"]').addClass('active');
+            if (cookies.sort != '--') {
+                $('#sortBy').html($('#sortByList li[data-sort="' + cookies.sort + '"]').html());
+            }
             $('select[name="sort"]').val(cookies.sort);
         }
     }
@@ -68,7 +72,14 @@ jQuery("document").ready(function ($) {
         window.location.reload(); // Перезавантажуємо сторінку
     });
     
-    $('select[name="sort"]').on('change', function() {
+    $('body').on('click', '#sortByList li', function() {
+        $('#sortByList li').removeClass('active');
+        $(this).addClass('active');
+        if ($(this).data('sort') != '--') {
+            $('#sortBy').html($(this).html());
+        }
+        const sort = $(this).data('sort');
+        $('select[name="sort"]').val(sort);
         saveFiltersToCookies(); // Зберігаємо фільтри у кукі
         window.location.reload(); // Перезавантажуємо сторінку
     });

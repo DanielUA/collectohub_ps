@@ -1,12 +1,12 @@
 {% extends 'coins/user_cabinet/base_user_cabinet.html' %} {% block user_page_content %}
 <div class="row">
-    <h5>Exchanged coins</h5>
+    <h5>Exchanged objects</h5>
     {% for coin in coins %}
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
         <div class="card mb-3">
             <a href="{% url 'coins:coin-detail' pk=coin.id %}">
                 {% if coin.img_front %}
-                <img src="{{ coin.img_front.url }}" alt="coin" class="card-img-top" />
+                <img src="{{ coin.img_front.url }}" alt="object" class="card-img-top" />
                 {% else %}
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" color="#eee" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
                     <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
@@ -17,7 +17,14 @@
                 {% endif %}
             </a>
             <div class="card-body">
-                <h6 class="card-title">{{ coin.denomination|title }} {{ coin.year }}</h6>
+                <h6 class="card-title">
+                    {% if coin.name %}
+                    {{ coin.name }}
+                    {% else %}
+                    {{ coin.denomination|title }}
+                    {% endif %}
+                     {{ coin.year }}
+                </h6>
                 <div class="d-flex justify-content-between">
                     <div>{{ coin.country }}</div>
                     <div>

@@ -1,6 +1,6 @@
 {% extends 'coins/base.html' %}
-{% block title %}{% if category.title and category.title != '' %}{{ category.title }}{% else %}{{ category.name }} Coins for Exchange – Collect and Swap | CollectoHub {% endif %} {% endblock %} 
-{% block description %}{% if category.description and category.description != '' %}{{ category.description }}{% else %}Explore collectible {{ category.name }} coins available for exchange. Join a global community of coin collectors and start swapping today on CollectoHub. {% endif %} {% endblock %}
+{% block title %}{% if category.title and category.title != '' %}{{ category.title }}{% else %}{{ category.name }} Objects for Exchange – Collect and Swap | CollectoHub {% endif %} {% endblock %} 
+{% block description %}{% if category.description and category.description != '' %}{{ category.description }}{% else %}Explore collectible {{ category.name }} objects available for exchange. Join a global community of object collectors and start swapping today on CollectoHub. {% endif %} {% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-md-3 mb-3">
@@ -35,13 +35,7 @@
                         </li>
                         {% endif %}
                         <li class="list-group-item">
-                            <label class="fw-bold">Material:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" name="material" type="checkbox" {% if material == 'ag' %}checked{% endif %} value="ag" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                  Silver
-                                </label>
-                              </div>
+                            {% include 'coins/elements/material_filter.html' %}
                         </li>
                         <li class="list-group-item">
                             <label>Change years:</label>
@@ -81,16 +75,7 @@
         </nav>
     </div>
     <div class="col-md-9">
-        <div class="row mb-3">
-            <div class="col-12 col-md-3">
-                <label class="fw-bold">Sort by:</label>
-                <select name="sort" class="form-select">
-                    <option value="--">--</option>
-                    <option value="year">Year up</option>
-                    <option value="-year">Year down</option>
-                </select>
-            </div>
-        </div>
+        {% include 'coins/elements/sort_field.html' %}
         <div class="row">
             {% for coin in coins %}
                 {% include 'coins/elements/coin_card.html' with coin=coin %}
