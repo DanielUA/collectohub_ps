@@ -1,23 +1,23 @@
-<div class="row mb-3">
-    <div class="col-12 col-md-3">
-        <select name="sort" class="form-select d-none">
+<div>
+    <div>
+        <select name="sort" class="form-select d-none filter-select" id="sortSelect">
             <option value="--">--</option>
-            <option value="year">Year up</option>
-            <option value="-year">Year down</option>
+            <option value="year" {% if active_filters.sort == 'year' %}selected{% endif %}>Year up</option>
+            <option value="-year" {% if active_filters.sort == '-year' %}selected{% endif %}>Year down</option>
         </select>
         <div class="btn-group" role="group">
             <button id="sortBy" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
             Sort by...
             </button>
             <ul id="sortByList" class="dropdown-menu" aria-labelledby="sortBy" style="max-height: 200px; overflow-y: auto;">
-                <li class="dropdown-item" data-sort="--">
+                <li class="dropdown-item filter-link {% if not active_filters.sort or active_filters.sort == '--' %}active{% endif %}" data-filter-type="sort" data-filter-value="--">
                     --
                 </li>
-                <li class="dropdown-item" data-sort="year">
-                    Year <i class="bi bi-arrow-up"></i>
+                <li class="dropdown-item filter-link {% if active_filters.sort == 'year' %}active{% endif %}" data-filter-type="sort" data-filter-value="year">
+                    Year <i class="bi bi-sort-numeric-down"></i>
                 </li>
-                <li class="dropdown-item" data-sort="-year">
-                    Year <i class="bi bi-arrow-down"></i>
+                <li class="dropdown-item filter-link {% if active_filters.sort == '-year' %}active{% endif %}" data-filter-type="sort" data-filter-value="-year">
+                    Year <i class="bi bi-sort-numeric-up-alt"></i>
                 </li>
             </ul>
         </div>

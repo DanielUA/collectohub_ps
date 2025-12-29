@@ -1,8 +1,8 @@
 {% extends 'coins/base.html' %} {% block title %} Collecto Hub {% endblock %} {% block content %}
-<div class="row">
-    <div class="col-md-3 mb-3">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container-fluid">
+<div class="d-flex flex-lg-row flex-column gap-2">
+    <div class="filters-menu p-0">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white p-0">
+            <div class="container-fluid justify-content-start gap-2 p-0">
                 <!-- Кнопка для мобільного меню -->
                 <button class="mb-3 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -13,93 +13,142 @@
                 <!-- Блок з меню -->
                 <div class="collapse navbar-collapse" id="navbarMenu">
                     <ol class="list-group w-100">
-                        {% if coin_categories|length > 0 %}
                         <li class="list-group-item">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop2" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Categories
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex justify-content-between gap-2">
+                                {% if typeobject_list|length > 0 %}
+                                <div class="btn-group flex-grow-1" role="group">
+                                    <button id="btnGroupDrop4" type="button" class="btn btn-light dropdown-toggle filter-dropdown" data-filter-type="type" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Type Objects
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop4" style="max-height: 200px; overflow-y: auto;">
+                                        <li class="px-3 py-2">
+                                            <input type="text" class="form-control form-control-sm dropdown-search" id="typeSearch" placeholder="Search type..." data-search-target="typeItems">
+                                        </li>
+                                        <li class="dropdown-item type-item" data-item-name="all">
+                                            <a href="#" class="text text-decoration-none filter-link" data-filter-type="type" data-filter-value="">All</a>
+                                        </li>
+                                        {% for typeobject in typeobject_list %}
+                                        <li class="dropdown-item type-item" data-item-name="{{ typeobject.name|lower }}">
+                                            <a href="#" class="text text-decoration-none filter-link {% if active_filters.type == typeobject.id %}active{% endif %}" data-filter-type="type" data-filter-value="{{ typeobject.id }}">
+                                                {{ typeobject.name|title }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                {% if continent_list|length > 0 %}
+                                    <div class="btn-group flex-grow-1" role="group">
+                                        <button id="btnGroupDrop3" type="button" class="btn btn-light dropdown-toggle filter-dropdown" data-filter-type="continent" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Continents
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="btnGroupDrop3" style="max-height: 200px; overflow-y: auto;">
+                                            <li class="px-3 py-2">
+                                                <input type="text" class="form-control form-control-sm dropdown-search" id="continentSearch" placeholder="Search continent..." data-search-target="continentItems">
+                                            </li>
+                                            <li class="dropdown-item continent-item" data-item-name="all">
+                                                <a href="#" class="text text-decoration-none filter-link" data-filter-type="continent" data-filter-value="">All</a>
+                                            </li>
+                                            {% for continent in continent_list %}
+                                            <li class="dropdown-item continent-item" data-item-name="{{ continent.name|lower }}">
+                                                <a href="#" class="text text-decoration-none filter-link {% if active_filters.continent == continent.id %}active{% endif %}" data-filter-type="continent" data-filter-value="{{ continent.id }}">
+                                                    {{ continent.name }}
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if coin_countries|length > 0 %}
+                            <div class="btn-group flex-grow-1" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle filter-dropdown" data-filter-type="country" data-bs-toggle="dropdown" aria-expanded="false">
+                                Change country
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop2" style="max-height: 200px; overflow-y: auto;">
-                                    {% for category in coin_categories %}
-                                    <li class="dropdown-item">
-                                        <a href="{% url 'coins:coin-category-detail' category.id %}" class="text text-decoration-none">
-                                            {{ category.name }}
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="max-height: 200px; overflow-y: auto;">
+                                    <li class="px-3 py-2">
+                                        <input type="text" class="form-control form-control-sm dropdown-search" id="countrySearch" placeholder="Search country..." data-search-target="countryItems">
+                                    </li>
+                                    <li class="dropdown-item country-item" data-item-name="all">
+                                        <a href="#" class="text text-decoration-none filter-link" data-filter-type="country" data-filter-value="">All</a>
+                                    </li>
+                                    {% for country in coin_countries %}
+                                    <li class="dropdown-item country-item" data-item-name="{{ country.name|lower }}">
+                                        <a href="#" class="text text-decoration-none filter-link {% if active_filters.country == country.id %}active{% endif %}" data-filter-type="country" data-filter-value="{{ country.id }}">
+                                            {{ country }}
                                         </a>
                                     </li>
                                     {% endfor %}
                                 </ul>
                             </div>
-                        </li>
-                        {% endif %}
-                        {% if continent_list|length > 0 %}
+                            {% endif %}
+                        </div>
+                    </li>
                         <li class="list-group-item">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop3" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Continents
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop3" style="max-height: 200px; overflow-y: auto;">
-                                    {% for continent in continent_list %}
-                                    <li class="dropdown-item">
-                                        <a href="{% url 'coins:continent-detail' continent.id %}" class="text text-decoration-none">
-                                            {{ continent.name }}
-                                        </a>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
+                            <div class="d-flex gap-2">
+                                <div class="btn-group flex-grow-1" role="group">
+                                    <button id="btnGroupDropDenomination" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Denomination
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDropDenomination" style="max-height: 200px; overflow-y: auto;">
+                                        <li class="px-3 py-2">
+                                            <input type="text" class="form-control form-control-sm dropdown-search" id="denominationSearch" placeholder="Search denomination..." data-search-target="denominationItems">
+                                        </li>
+                                        {% for i in list_denomination %}
+                                        <li class="dropdown-item denomination-item" data-item-name="{{ i|lower }}">
+                                            <div class="form-check">
+                                                <input name="denomination" class="form-check-input filter-checkbox" type="checkbox" value="{{ i }}" id="denom_{{ forloop.counter }}" {% if i in active_filters.denomination %}checked{% endif %}>
+                                                <label class="form-check-label" for="denom_{{ forloop.counter }}">
+                                                    {{ i }}
+                                                </label>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="flex-grow-1">
+                                    {% include 'coins/elements/material_filter.html' %}
+                                </div>
                             </div>
-                        </li>
-                        {% endif %}
-                        {% if typeobject_list|length > 0 %}
-                        <li class="list-group-item">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop4" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Type Objects
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop4" style="max-height: 200px; overflow-y: auto;">
-                                    {% for typeobject in typeobject_list %}
-                                    <li class="dropdown-item">
-                                        <a href="{% url 'coins:objects-types-detail' typeobject.id %}" class="text text-decoration-none">
-                                            {{ typeobject.name|title }}
-                                        </a>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </li>
-                        {% endif %}
-                        <li class="list-group-item">
-                            {% include 'coins/elements/material_filter.html' %}
                         </li>
                         <li class="list-group-item">
                             <label>Change years:</label>
                             <div class="d-flex gap-3">
-                                <input name="min_year" type="number" class="form-control" id="yearInput" min="{{min_year}}" max="{{max_year}}" value="{{min_year}}">
-                                <input name="max_year" type="number" class="form-control" id="yearInput" min="{{min_year}}" max="{{max_year}}" value="{{max_year}}">
+                                <input name="min_year" type="number" class="form-control filter-input" id="minYearInput" min="{{min_year}}" max="{{max_year}}" value="{{ active_filters.min_year|default:min_year }}">
+                                <input name="max_year" type="number" class="form-control filter-input" id="maxYearInput" min="{{min_year}}" max="{{max_year}}" value="{{ active_filters.max_year|default:max_year }}">
                             </div>
                         </li>
+                        
+                        {% if coin_categories|length > 0 %}
                         <li class="list-group-item">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Change denomination
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="max-height: 200px; overflow-y: auto;">
-                                    {% for i in list_denomination %}
-                                    <li class="dropdown-item">
-                                        <div class="form-check">
-                                            <input name="denomination" class="form-check-input" type="checkbox" value="{{ i }}" id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">
-                                                {{ i }}
-                                            </label>
-                                        </div>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
+                            <label class="fw-bold mb-2 d-block">Categories:</label>
+                            <input type="text" class="form-control form-control-sm mb-2" id="categorySearch" placeholder="Search categories...">
+                            <div class="border rounded p-2 categories-list" style="max-height: 300px; overflow-y: auto;" id="categoriesContainer">
+                                <div class="mb-1 category-item" data-category-name="all">
+                                    <a href="#" class="text text-decoration-none filter-link {% if not active_filters.category %}fw-bold text-primary{% endif %}" data-filter-type="category" data-filter-value="">
+                                        All
+                                    </a>
+                                </div>
+                                {% for item in coin_categories %}
+                                    {% if item.count > 0 %}
+                                    <div class="mb-1 category-item" data-category-name="{{ item.category.name|lower }}">
+                                        <a href="#" class="text text-decoration-none filter-link {% if active_filters.category == item.category.id %}fw-bold text-primary{% endif %}" 
+                                           data-filter-type="category" 
+                                           data-filter-value="{{ item.category.id }}">
+                                            {{ item.category.name }} <span class="text-muted">({{ item.count }})</span>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </li>
+                        {% endif %}
                         <li class="list-group-item">
                             <div class="d-flex gap-3">
-                                <button class="btn btn-primary confirm_filters">Confirm filters</button>
-                                <button id="resetFilters" class="btn btn-outline-danger" style="display: none;"><i class="bi bi-arrow-clockwise"></i></button>
+                                <button id="resetFilters" class="btn btn-outline-danger" {% if not active_filters.continent and not active_filters.country and not active_filters.type and not active_filters.category and not active_filters.denomination and not active_filters.material and not active_filters.min_year and not active_filters.max_year and not active_filters.sort %}style="display: none;"{% endif %}>
+                                    <i class="bi bi-arrow-clockwise"></i> Reset
+                                </button>
                             </div>
                         </li>
                     </ol>
@@ -107,8 +156,63 @@
             </div>
         </nav>
     </div>
-    <div class="col-md-9">
-        {% include 'coins/elements/sort_field.html' %}
+    <div class="flex-grow-1 d-flex flex-column gap-2">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            {% include 'coins/elements/sort_field.html' %}
+
+            <!-- Active Filters Chips -->
+            {% if active_filters.continent or active_filters.country or active_filters.type or active_filters.category or active_filters.denomination or active_filters.material or active_filters.min_year or active_filters.max_year or active_filters.sort %}
+                <span class="fw-bold">Active filters:</span>
+                {% if active_filters.continent %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Continent: {{ active_filter_labels.continent }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="continent"></button>
+                </span>
+                {% endif %}
+                {% if active_filters.country %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Country: {{ active_filter_labels.country }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="country"></button>
+                </span>
+                {% endif %}
+                {% if active_filters.type %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Type: {{ active_filter_labels.type }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="type"></button>
+                </span>
+                {% endif %}
+                {% if active_filters.category %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Category: {{ active_filter_labels.category }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="category"></button>
+                </span>
+                {% endif %}
+                {% for denom in active_filters.denomination %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Denomination: {{ denom }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="denomination" data-filter-value="{{ denom }}"></button>
+                </span>
+                {% endfor %}
+                {% if active_filters.material %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Material: {{ active_filters.material }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="material"></button>
+                </span>
+                {% endif %}
+                {% if active_filters.min_year or active_filters.max_year %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Years: {{ active_filters.min_year|default:min_year }}-{{ active_filters.max_year|default:max_year }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="years"></button>
+                </span>
+                {% endif %}
+                {% if active_filters.sort %}
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                    Sort: {{ active_filters.sort }}
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" data-remove-filter="sort"></button>
+                </span>
+                {% endif %}
+            {% endif %}
+        </div>
         <div class="row">
             {% for coin in page_obj %}
                 {% include 'coins/elements/coin_card.html' with coin=coin %}
@@ -120,7 +224,7 @@
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <a class="page-link" href="?{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}{{ key }}={{ value }}&{% endfor %}{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -132,17 +236,17 @@
                     </li>
                     {% endif %} {% for num in page_obj.paginator.page_range %} {% if num == 1 or num == page_obj.paginator.num_pages %}
                     <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}{{ key }}={{ value }}&{% endfor %}{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
                     </li>
                     {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
                     <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}{{ key }}={{ value }}&{% endfor %}{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
                     </li>
                     {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
                     <li class="page-item disabled"><span class="page-link">...</span></li>
                     {% endif %} {% endfor %} {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <a class="page-link" href="?{% for key, value_list in request.GET.lists %}{% if key != 'page' %}{% for value in value_list %}{{ key }}={{ value }}&{% endfor %}{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -159,4 +263,9 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'coins/filters.js' %}"></script>
 {% endblock %}
