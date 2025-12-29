@@ -1,5 +1,24 @@
-<label class="fw-bold">Material:</label>
-<div class="form-check">
-    <input class="form-check-input" name="material" type="checkbox" {% if material == 'silver' %}checked{% endif %} value="silver" id="flexCheckDefault">
-    <label class="form-check-label" for="flexCheckDefault"> Silver </label>
+<div class="btn-group w-100" role="group">
+    <button id="btnGroupDropMaterial" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Material
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="btnGroupDropMaterial" style="max-height: 200px; overflow-y: auto;">
+        <li class="px-3 py-2">
+            <input type="text" class="form-control form-control-sm dropdown-search" id="materialSearch" placeholder="Search material..." data-search-target="materialItems">
+        </li>
+        <li class="dropdown-item material-item" data-item-name="all">
+            <a href="#" class="text text-decoration-none filter-link {% if not active_filters.material %}active{% endif %}" data-filter-type="material" data-filter-value="">
+                All
+            </a>
+        </li>
+        {% for value, label in material_choices %}
+        <li class="dropdown-item material-item" data-item-name="{{ value|lower }}">
+            <a href="#" class="text text-decoration-none filter-link {% if active_filters.material == value %}active{% endif %}" 
+               data-filter-type="material" 
+               data-filter-value="{{ value }}">
+                {{ value|title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
 </div>

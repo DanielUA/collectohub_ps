@@ -22,6 +22,7 @@ from django.core.paginator import Paginator
 
 from .forms import *
 from .sterializers import *
+from .models import material_choices
 from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -38,47 +39,197 @@ class IndexView(ListView):
     model = Coin
     context_object_name = "coin_list"
     template_name = 'coins/all_coins_page.html'
-    extra_context = {
-        "continent_list": Continent.objects.all().order_by("name"),
-        "coin_categories": CoinCategory.objects.filter(parent=None, countries=None, continents=None),
-        "typeobject_list": TypeObject.objects.all(),
-    }
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Coin.objects.filter(status='a').order_by('-views_counter')
+        queryset = Coin.objects.filter(status='a')
         
-        # Отримуємо фільтри з кукі, якщо вони є
-        cookies = self.request.COOKIES
-        min_year = cookies.get('min_year')
-        max_year = cookies.get('max_year')
-        denomination = cookies.get('denomination')
-        material = cookies.get('material')
-        sort = cookies.get('sort')
-        if min_year != '' and min_year is not None:
-            queryset = queryset.filter(year__gte=min_year)
-        if max_year != '' and max_year is not None:
-            queryset = queryset.filter(year__lte=max_year)
-        if denomination is not None and denomination != '':
-            denomination = denomination.split(',')
+        # Отримуємо фільтри з URL параметрів
+        continent_id = self.request.GET.get('continent')
+        country_id = self.request.GET.get('country')
+        type_id = self.request.GET.get('type')
+        category_id = self.request.GET.get('category')
+        min_year = self.request.GET.get('min_year')
+        max_year = self.request.GET.get('max_year')
+        denomination = self.request.GET.getlist('denomination')
+        material = self.request.GET.get('material')
+        sort = self.request.GET.get('sort')
+        
+        # Застосовуємо фільтри
+        if continent_id:
+            queryset = queryset.filter(country__continent_id=continent_id)
+        if country_id:
+            queryset = queryset.filter(country_id=country_id)
+        if type_id:
+            queryset = queryset.filter(type_object_id=type_id)
+        if category_id:
+            # Включаємо монети з категорії та всіх підкатегорій
+            try:
+                category = CoinCategory.objects.get(id=category_id)
+                subcategories = category.get_all_subcategories()
+                subcategory_ids = [cat.id for cat in subcategories]
+                queryset = queryset.filter(
+                    Q(category=category) | Q(category__id__in=subcategory_ids)
+                ).distinct()
+            except CoinCategory.DoesNotExist:
+                pass
+        if min_year:
+            try:
+                queryset = queryset.filter(year__gte=int(min_year))
+            except ValueError:
+                pass
+        if max_year:
+            try:
+                queryset = queryset.filter(year__lte=int(max_year))
+            except ValueError:
+                pass
+        if denomination:
             queryset = queryset.filter(denomination__in=denomination)
-        if material is not None and material != '' and material != 'undefined':
+        if material and material != 'undefined':
             queryset = queryset.filter(material=material)
-        if sort is not None and sort != '' and sort != '--' and sort != 'undefined':
+        if sort and sort != '--' and sort != 'undefined':
             queryset = queryset.order_by(sort)
+        else:
+            queryset = queryset.order_by('-views_counter')
+            
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(owner=self.request.user)
 
         return queryset
 
     def get_context_data(self, **kwargs):
-        # Отримуємо базовий контекст
         context = super().get_context_data(**kwargs)
-
-        # Додаємо додаткові змінні до контексту
-        context["min_year"] = Coin.objects.filter(status='a').aggregate(min=Min('year'))['min'] or 0
-        context["max_year"] = Coin.objects.filter(status='a').aggregate(max=Max('year'))['max'] or 0
-        context["list_denomination"] = Coin.objects.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Отримуємо поточні фільтри з URL
+        continent_id = self.request.GET.get('continent')
+        country_id = self.request.GET.get('country')
+        type_id = self.request.GET.get('type')
+        category_id = self.request.GET.get('category')
+        min_year = self.request.GET.get('min_year')
+        max_year = self.request.GET.get('max_year')
+        material = self.request.GET.get('material')
+        sort = self.request.GET.get('sort')
+        
+        # Базовий queryset для підрахунку
+        base_queryset = Coin.objects.filter(status='a')
+        if self.request.user.is_authenticated:
+            base_queryset = base_queryset.exclude(owner=self.request.user)
+        
+        # Застосовуємо фільтри для підрахунку facet counts
+        filtered_queryset = base_queryset
+        if continent_id:
+            filtered_queryset = filtered_queryset.filter(country__continent_id=continent_id)
+        if country_id:
+            filtered_queryset = filtered_queryset.filter(country_id=country_id)
+        if type_id:
+            filtered_queryset = filtered_queryset.filter(type_object_id=type_id)
+        if category_id:
+            try:
+                category = CoinCategory.objects.get(id=category_id)
+                subcategories = category.get_all_subcategories()
+                subcategory_ids = [cat.id for cat in subcategories]
+                filtered_queryset = filtered_queryset.filter(
+                    Q(category=category) | Q(category__id__in=subcategory_ids)
+                ).distinct()
+            except CoinCategory.DoesNotExist:
+                pass
+        
+        # Континенти
+        context["continent_list"] = Continent.objects.all().order_by("name")
+        
+        # Країни - звужуємо якщо вибрано континент
+        if continent_id:
+            context["coin_countries"] = Country.objects.filter(
+                continent_id=continent_id
+            ).order_by("name")
+        else:
+            context["coin_countries"] = Country.objects.all().order_by("name")
+        
+        # Типи об'єктів
+        context["typeobject_list"] = TypeObject.objects.all()
+        
+        # Категорії з facet counts
+        categories_queryset = CoinCategory.objects.filter(parent=None)
+        
+        # Звужуємо категорії залежно від фільтрів
+        # Якщо вибрано країну, показуємо категорії для цієї країни або загальні
+        if country_id:
+            categories_queryset = categories_queryset.filter(
+                Q(countries__id=country_id) | Q(countries__isnull=True)
+            ).distinct()
+        # Якщо вибрано континент (але не країну), показуємо категорії для цього континенту або загальні
+        elif continent_id:
+            categories_queryset = categories_queryset.filter(
+                Q(continents__id=continent_id) | Q(continents__isnull=True)
+            ).distinct()
+        
+        # Якщо вибрано тип, показуємо категорії для цього типу або загальні
+        if type_id:
+            categories_queryset = categories_queryset.filter(
+                Q(type_objects__id=type_id) | Q(type_objects__isnull=True)
+            ).distinct()
+        
+        # Додаємо facet counts для категорій
+        categories_with_counts = []
+        for category in categories_queryset:
+            # Підраховуємо монети для цієї категорії з урахуванням поточних фільтрів
+            subcategories = category.get_all_subcategories()
+            subcategory_ids = [cat.id for cat in subcategories]
+            count = filtered_queryset.filter(
+                Q(category=category) | Q(category__id__in=subcategory_ids)
+            ).distinct().count()
+            categories_with_counts.append({
+                'category': category,
+                'count': count
+            })
+        
+        context["coin_categories"] = categories_with_counts
+        
+        # Мінімальний та максимальний рік
+        context["min_year"] = base_queryset.aggregate(min=Min('year'))['min'] or 0
+        context["max_year"] = base_queryset.aggregate(max=Max('year'))['max'] or 0
+        
+        # Номінали
+        context["list_denomination"] = base_queryset.order_by('denomination').values_list('denomination', flat=True).distinct()
+        
+        # Поточні значення фільтрів для відображення
+        context["active_filters"] = {
+            'continent': int(continent_id) if continent_id else None,
+            'country': int(country_id) if country_id else None,
+            'type': int(type_id) if type_id else None,
+            'category': int(category_id) if category_id else None,
+            'min_year': min_year,
+            'max_year': max_year,
+            'denomination': self.request.GET.getlist('denomination'),
+            'material': material,
+            'sort': sort,
+        }
+        
+        # Назви активних фільтрів для chips
+        active_filter_labels = {}
+        if continent_id:
+            try:
+                active_filter_labels['continent'] = Continent.objects.get(id=continent_id).name
+            except Continent.DoesNotExist:
+                pass
+        if country_id:
+            try:
+                active_filter_labels['country'] = Country.objects.get(id=country_id).name
+            except Country.DoesNotExist:
+                pass
+        if type_id:
+            try:
+                active_filter_labels['type'] = TypeObject.objects.get(id=type_id).name
+            except TypeObject.DoesNotExist:
+                pass
+        if category_id:
+            try:
+                active_filter_labels['category'] = CoinCategory.objects.get(id=category_id).name
+            except CoinCategory.DoesNotExist:
+                pass
+        
+        context["active_filter_labels"] = active_filter_labels
+        context["material_choices"] = material_choices
 
         return context
     
